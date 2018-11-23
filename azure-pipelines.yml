@@ -1,0 +1,55 @@
+name: $(Date:yyyyMMdd).$(Rev:.r)
+trigger:
+- master
+pr:
+- master
+jobs:
+- job: Tests
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+    - task: Powershell@2
+      displayName: 'Test'
+      inputs:
+        targetType: 'filePath'
+        filePath: .\Build\Start-Build.ps1
+        arguments: -Task Test -Verbose
+        errorActionPreference: 'stop'
+        failOnStderr: true
+
+- job: PublishTestResults
+  pool:
+    vmImage: 'vs2017-win2016'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  steps:
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      condition: always()
+      inputs:
+        testRunner: 'NUnit'
+        testResultsFiles: '**/TestResults.xml'
+        testRunTitle: 'PS_Win2016'
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish Code Coverage Results'
+      condition: always()
+      inputs:
+        codeCoverageTool: 'JaCoCo'
+        summaryFileLocation: '**/TestCoverage.xml'
+
+- job: BuilAndDeploy
+  pool:
+    vmImage: 'vs2017-win2016'
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+  workspace:
+    clean: all
+  dependsOn: Tests
+  steps:
+    - task: Powershell@2
+      displayName: 'Build and deploy'
+      inputs:
+        targetType: 'filePath'
+        filePath: .\Build\Start-Build.ps1
+        arguments: -Task Deploy -Verbose
+        errorActionPreference: 'stop'
+        failOnStderr: true
