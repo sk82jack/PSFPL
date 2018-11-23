@@ -4,7 +4,7 @@ trigger:
 pr:
 - master
 jobs:
-- job: Tests
+- job: Test_Build_Deploy
   pool:
     vmImage: 'vs2017-win2016'
   steps:
@@ -17,15 +17,9 @@ jobs:
         errorActionPreference: 'stop'
         failOnStderr: true
 
-- job: PublishTestResults
-  pool:
-    vmImage: 'vs2017-win2016'
-  dependsOn: Tests
-  condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  steps:
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
-      condition: always()
+      condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       inputs:
         testRunner: 'NUnit'
         testResultsFiles: '**/TestResults.xml'
@@ -33,21 +27,14 @@ jobs:
 
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish Code Coverage Results'
-      condition: always()
+      condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       inputs:
         codeCoverageTool: 'JaCoCo'
         summaryFileLocation: '**/TestCoverage.xml'
 
-- job: BuilAndDeploy
-  pool:
-    vmImage: 'vs2017-win2016'
-  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
-  workspace:
-    clean: all
-  dependsOn: Tests
-  steps:
     - task: Powershell@2
       displayName: 'Build and deploy'
+      condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
       inputs:
         targetType: 'filePath'
         filePath: .\Build\Start-Build.ps1
