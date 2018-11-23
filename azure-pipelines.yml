@@ -20,7 +20,8 @@ jobs:
 - job: PublishTestResults
   pool:
     vmImage: 'vs2017-win2016'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  dependsOn: Tests
+  condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   steps:
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
