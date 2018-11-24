@@ -47,7 +47,7 @@ function Get-FplPlayer {
         $Name,
 
         [Parameter(ParameterSetName = 'Filter')]
-        [ValidateSet('Forward', 'Midfeilder', 'Defender', 'Goalkeeper')]
+        [ValidateSet('Forward', 'Midfielder', 'Defender', 'Goalkeeper')]
         [string]
         $Position,
 
