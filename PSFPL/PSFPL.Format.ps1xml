@@ -1,7 +1,46 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <Configuration>
     <ViewDefinitions>
         <View>
+            <Name>FplPlayer</Name>
+            <ViewSelectedBy>
+                <TypeName>FplPlayer</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>right</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>right</Alignment>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>WebName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Club</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Price</PropertyName>
+                                <FormatString>£#0.0m</FormatString>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>TotalPoints</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
         </View>
     </ViewDefinitions>
 </Configuration>
