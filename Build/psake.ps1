@@ -60,19 +60,26 @@ Task Test -Depends Init {
 }
 
 Task BuildDocs -depends Test {
+    $lines
+
+    "`n`tBuilding documentation"
     $DocFolder = "$env:BHModulePath\docs"
     if (!(Test-Path $DocFolder)) {
         New-Item -Path $DocFolder -ItemType Directory
     }
     Import-Module -Name $env:BHPSModuleManifest -Force
     New-MarkdownHelp -Module $env:BHProjectName -OutputFolder $DocFolder
+
+    "`tPushing built docs to GitHub"
     git add "$DocFolder/*"
-    git commit -m "Update docs for release"
+    git commit -m "Update docs for release ***NO_CI***"
     git push $GitHubUrl HEAD.master
+    "`n"
 }
 
 Task Build -Depends BuildDocs {
     $lines
+    "`n"
 
     # Compile seperate ps1 files into the psm1
     $Stringbuilder = [System.Text.StringBuilder]::new()
@@ -83,22 +90,22 @@ Task Build -Depends BuildDocs {
             $Files = Get-ChildItem "$env:BHModulePath\$Folder\*.ps1"
             foreach ($File in $Files) {
                 $Name = $File.Name
-                "  Importing [.$Name]"
+                "`tImporting [.$Name]"
                 [void]$Stringbuilder.AppendLine("# .$Name")
                 [void]$Stringbuilder.AppendLine([System.IO.File]::ReadAllText($File.fullname))
             }
         }
-        "  Removing folder [$env:BHModulePath\$Folder]"
+        "`tRemoving folder [$env:BHModulePath\$Folder]"
         Remove-Item -Path "$env:BHModulePath\$Folder" -Recurse -Force
     }
     $ModulePath = Join-Path -Path $env:BHModulePath -ChildPath "$env:BHProjectName.psm1"
-    "  Creating module [$ModulePath]"
+    "`tCreating module [$ModulePath]"
     Set-Content -Path $ModulePath -Value $Stringbuilder.ToString()
 
     # Load the module, read the exported functions & aliases, update the psd1 FunctionsToExport & AliasesToExport
-    "  Setting module functions"
+    "`tSetting module functions"
     Set-ModuleFunctions
-    "  Setting module aliases"
+    "`tSetting module aliases"
     Set-ModuleAliases
 
     # Bump the module version if we didn't already
@@ -110,7 +117,7 @@ Task Build -Depends BuildDocs {
         }
     }
     Catch {
-        "Failed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
+        "`tFailed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
     }
     "`n"
 }
@@ -123,6 +130,6 @@ Task Deploy -Depends Build {
         Force   = $true
         Recurse = $false # We keep psdeploy artifacts, avoid deploying those : )
     }
-    "`nInvoking PSDeploy"
+    "`tInvoking PSDeploy"
     Invoke-PSDeploy @Verbose @Params
 }
