@@ -1,4 +1,4 @@
-function Get-FplElementTypes {
+function Get-FplElementType {
     $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/element-types' -UseBasicParsing
     $ElementHash = @{}
     foreach ($Element in $Response) {

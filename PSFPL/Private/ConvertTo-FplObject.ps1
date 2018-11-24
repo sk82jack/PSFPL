@@ -27,7 +27,7 @@ function ConvertTo-FplObject {
     )
     switch ($Type) {
         'FplPlayer' {
-            $PositionHash = Get-FplElementTypes
+            $PositionHash = Get-FplElementType
             $TeamHash = Get-FplClubId
         }
     }
