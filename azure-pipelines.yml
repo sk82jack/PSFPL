@@ -35,6 +35,8 @@ jobs:
     - task: Powershell@2
       displayName: 'Build and deploy'
       condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+      env:
+        GITHUB_PAT: $(github.pat)
       inputs:
         targetType: 'filePath'
         filePath: .\Build\Start-Build.ps1
