@@ -4,6 +4,20 @@ InModuleScope 'PSFPL' {
         BeforeAll {
             $Password = ConvertTo-SecureString "password" -AsPlainText -Force
             $Creds = [Management.Automation.PSCredential]::new("UserName", $Password)
+
+            Mock Invoke-WebRequest {
+                [PSCustomObject]@{
+                    InputFields = @(
+                        [pscustomobject]@{
+                            name  = 'csrfmiddlewaretoken'
+                            value = 'csrfmiddlewaretoken'
+                        }
+                    )
+                    Headers     = [PSCustomObject]@{
+                        'Set-Cookie' = $false
+                    }
+                }
+            }
         }
         Context 'Input' {
             It 'Credential parameter is mandatory' {
@@ -11,15 +25,6 @@ InModuleScope 'PSFPL' {
             }
         }
         Context 'Execution' {
-            BeforeAll {
-                Mock Invoke-WebRequest {
-                    [PSCustomObject]@{
-                        Headers = [PSCustomObject]@{
-                            'Set-Cookie' = $false
-                        }
-                    }
-                }
-            }
             It 'If incorrect credentials are given, throws a terminating error' {
                 {Connect-FPL -Credential $Creds} | Should -Throw
             }
