@@ -11,6 +11,9 @@ Properties {
     if ($ENV:BHCommitMessage -match "!verbose") {
         $Verbose = @{Verbose = $True}
     }
+    git config user.email 'sk82jack@hotmail.com'
+    git config user.name 'sk82jack'
+    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 }
 
 Task Default -Depends Test
@@ -63,6 +66,9 @@ Task BuildDocs -depends Test {
     }
     Import-Module -Name $env:BHPSModuleManifest -Force
     New-MarkdownHelp -Module $env:BHProjectName -OutputFolder $DocFolder
+    git add "$DocFolder/*"
+    git commit -m "Update docs for release"
+    git push $GitHubUrl HEAD.master
 }
 
 Task Build -Depends BuildDocs {
