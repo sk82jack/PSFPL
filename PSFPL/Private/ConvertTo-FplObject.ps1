@@ -16,14 +16,21 @@ function ConvertTo-FplObject {
     #>
     [CmdletBinding()]
     Param (
-        [Parameter()]
+        [Parameter(Mandatory)]
         [object[]]
         $InputObject,
 
-        [Parameter()]
+        [Parameter(Mandatory)]
+        [ValidateSet('FplPlayer')]
         [string]
         $Type
     )
+    switch ($Type) {
+        'FplPlayer' {
+            $PositionHash = Get-FplElementTypes
+            $TeamHash = Get-FplClubIds
+        }
+    }
 
     $TextInfo = (Get-Culture).TextInfo
     foreach ($Object in $InputObject) {
@@ -31,13 +38,23 @@ function ConvertTo-FplObject {
         $Object.psobject.properties | Foreach-Object {
             $Name = $TextInfo.ToTitleCase($_.Name) -replace '_'
             $Value = if ($_.Value -is [string]) {
-                [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
+                $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
+                [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($DiacriticName))
             }
             else {
                 $_.Value
             }
             $Hashtable[$Name] = $Value
         }
+
+        switch ($Type) {
+            'FplPlayer' {
+                $Hashtable['Position'] = $PositionHash[$Object.element_type]
+                $Hashtable['Club'] = $TeamHash[$Object.team]
+                $Hashtable['Price'] = $Object.now_cost / 10
+            }
+        }
+
         $FplObject = [pscustomobject]$Hashtable
         $FplObject.PSObject.TypeNames.Insert(0, $Type)
         $FplObject
