@@ -11,6 +11,7 @@ Properties {
     if ($ENV:BHCommitMessage -match "!verbose") {
         $Verbose = @{Verbose = $True}
     }
+
     git config user.email 'sk82jack@hotmail.com'
     git config user.name 'sk82jack'
     $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
@@ -61,17 +62,46 @@ Task Test -Depends Init {
 
 Task BuildDocs -depends Test {
     $lines
+    Import-Module -Name $env:BHPSModuleManifest -Force
+    $DocFolder = "$env:BHModulePath\docs"
+    $YMLtext = (Get-Content "$env:BHModulePath\header-mkdocs.yml") -join "`n"
+    $YMLtext = "$YMLtext`n  - Change Log: ChangeLog.md`n"
+    $YMLText = "$YMLtext  - Functions:`n"
+
+    "`n`tRemoving old documentation"
+    $parameters = @{
+        Recurse     = $true
+        Force       = $true
+        Path        = "$DocFolder\functions"
+        ErrorAction = 'SilentlyContinue'
+    }
+    $null = Remove-Item @parameters
 
     "`n`tBuilding documentation"
-    $DocFolder = "$env:BHModulePath\docs"
     if (!(Test-Path $DocFolder)) {
         New-Item -Path $DocFolder -ItemType Directory
     }
-    Import-Module -Name $env:BHPSModuleManifest -Force
-    New-MarkdownHelp -Module $env:BHProjectName -OutputFolder $DocFolder
+    $Params = @{
+        Module       = $ENV:BHProjectName
+        Force        = $true
+        OutputFolder = "$DocFolder\functions"
+        NoMetadata   = $true
+    }
+    New-MarkdownHelp @Params | foreach-object {
+        $Function = $_.Name -replace '\.md', ''
+        $Part = "    - {0}: functions/{1}" -f $Function, $_.Name
+        $YMLText = "{0}{1}`n" -f $YMLText, $Part
+        $Part
+    }
+    $YMLtext | Set-Content -Path "$env:BHModulePath\mkdocs.yml"
+    Copy-Item -Path "$env:BHModulePath\README.md" -Destination "$DocFolder\index.md" -Force
+    Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion ################################################################
+    Convertfrom-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
 
     "`tPushing built docs to GitHub"
-    git add "$DocFolder/*"
+    git add "$DocFolder\*"
+    git add "$env:BHModulePath\mkdocs.yml"
+    git add "$env:BHModulePath\CHANGELOG.md"
     git commit -m "Update docs for release ***NO_CI***"
     git push $GitHubUrl HEAD.master
     "`n"
