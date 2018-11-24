@@ -1,6 +1,6 @@
 Import-Module $ENV:BHPSModuleManifest -Force
-Describe 'Get-FplClubId' {
-    InModuleScope 'PSFPL' {
+InModuleScope 'PSFPL' {
+    Describe 'Get-FplClubId' {
         It 'Parses objects into hashtable' {
             Mock Invoke-RestMethod {
                 @(

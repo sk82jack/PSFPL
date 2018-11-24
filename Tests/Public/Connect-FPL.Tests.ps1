@@ -1,6 +1,6 @@
 Import-Module $ENV:BHPSModuleManifest -Force
-Describe 'Connect-FPL' {
-    InModuleScope 'PSFPL' {
+InModuleScope 'PSFPL' {
+    Describe 'Connect-FPL' {
         BeforeAll {
             $Password = ConvertTo-SecureString "password" -AsPlainText -Force
             $Creds = [Management.Automation.PSCredential]::new("UserName", $Password)

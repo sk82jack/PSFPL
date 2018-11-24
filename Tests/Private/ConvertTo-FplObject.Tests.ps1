@@ -1,6 +1,6 @@
 ﻿Import-Module $ENV:BHPSModuleManifest -Force
-Describe 'ConvertTo-FplObject' {
-    InModuleScope 'PSFPL' {
+InModuleScope 'PSFPL' {
+    Describe 'ConvertTo-FplObject' {
         Context 'FplPlayer type' {
             BeforeAll {
                 $Object = [PSCustomObject]@{
