@@ -12,7 +12,7 @@ function Connect-Fpl {
     .LINK
         https://psfpl.readthedocs.io/en/latest/functions/Connect-Fpl
     .LINK
-        https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Connect-Fpl.ps1
+        https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Connect-FPL.ps1
     #>
     [Cmdletbinding()]
     Param (
