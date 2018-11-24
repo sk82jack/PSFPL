@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Get-FplPlayer - a function to retrieve player data
+- Connect-FPL - a function to log into the FPL API to retrieve data about your team
 
 ### Changed
 
