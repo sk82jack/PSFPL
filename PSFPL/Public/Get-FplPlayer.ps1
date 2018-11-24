@@ -1,4 +1,42 @@
 function Get-FplPlayer {
+    <#
+    .SYNOPSIS
+        Retrieve a list of FPL players
+    .DESCRIPTION
+        Retrieve a list of FPL players
+    .PARAMETER Name
+        Filter players based on their surname
+    .PARAMETER Position
+        Filter players based on their position
+    .PARAMETER Club
+        Filter players based on their club
+    .PARAMETER MaxPrice
+        Filter players based on their price
+    .PARAMETER DreamTeam
+        Show the current dream team
+    .EXAMPLE
+        Get-FplPlayer
+
+        Retrieve all of the FPL players in the game
+    .EXAMPLE
+        Get-FplPlayer -Name Hazard
+
+        Retrieve all of the FPL players with 'Hazard' in their name
+    .EXAMPLE
+        Get-FplPlayer -Position Forward -Club 'Man City'
+
+        Retrieve all of the forwards that play for Man City
+    .EXAMPLE
+        Get-FplPlayer -MaxPrice 5.1
+
+        Retrieve all players priced at £5.1m or lower
+    .EXAMPLE
+        Get-FplPlayer -DreamTeam
+
+        Retrieve the current dream team
+    .LINK
+        https://github.com/sk82jack/PSFPL/
+    #>
     [CmdletBinding(DefaultParameterSetName = 'Filter')]
     Param (
         [Parameter(
