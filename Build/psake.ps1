@@ -14,6 +14,9 @@ Properties {
 
     git config user.email 'sk82jack@hotmail.com'
     git config user.name 'sk82jack'
+    if (!$ENV:GITHUB_PAT) {
+        Write-Error "GitHub personal access token not found"
+    }
     $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 }
 
@@ -37,7 +40,7 @@ Task SetBuildVersion -Depends Init {
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
     git commit -m "Update build version ***NO_CI***"
-    git push $GitHubUrl HEAD.master
+    git push $GitHubUrl master
     "`n"
 }
 
@@ -163,7 +166,7 @@ Task BuildDocs -depends Build {
     git add "$env:BHModulePath\mkdocs.yml"
     git add "$env:BHModulePath\CHANGELOG.md"
     git commit -m "Update docs for release ***NO_CI***"
-    git push $GitHubUrl HEAD.master
+    git push $GitHubUrl master
     "`n"
 }
 
