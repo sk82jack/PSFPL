@@ -1,6 +1,6 @@
 @{
     # Some defaults for all dependencies
-    PSDependOptions = @{
+    PSDependOptions       = @{
         Target     = '$ENV:USERPROFILE\Documents\WindowsPowerShell\Modules'
         AddToPath  = $True
         Parameters = @{
@@ -9,10 +9,12 @@
     }
 
     # Grab some modules without depending on PowerShellGet
-    'psake'         = @{ DependencyType = 'PSGalleryNuget' }
-    'PSDeploy'      = @{ DependencyType = 'PSGalleryNuget' }
-    'BuildHelpers'  = @{ DependencyType = 'PSGalleryNuget' }
-    'Pester'        = @{
+    'psake'               = @{ DependencyType = 'PSGalleryNuget' }
+    'PSDeploy'            = @{ DependencyType = 'PSGalleryNuget' }
+    'BuildHelpers'        = @{ DependencyType = 'PSGalleryNuget' }
+    'PlatyPS'             = @{ DependencyType = 'PSGalleryNuget' }
+    'ChangelogManagement' = @{ DependencyType = 'PSGalleryNuget' }
+    'Pester'              = @{
         DependencyType = 'PSGalleryNuget'
         Version        = '4.4.2'
     }

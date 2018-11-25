@@ -1,4 +1,4 @@
-name: $(Date:yyyyMMdd).$(Rev:.r)
+name: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 trigger:
 - master
 pr:
@@ -33,8 +33,23 @@ jobs:
         summaryFileLocation: '**/TestCoverage.xml'
 
     - task: Powershell@2
+      displayName: 'Set build version'
+      condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      env:
+        BUILD_NAME: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+      inputs:
+        targetType: 'filePath'
+        filePath: .\Build\Start-Build.ps1
+        arguments: -Task SetBuildVersion -Verbose
+        errorActionPreference: 'stop'
+        failOnStderr: true
+
+    - task: Powershell@2
       displayName: 'Build and deploy'
       condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+      env:
+        GITHUB_PAT: $(github.pat)
+        PSREPO_APIKEY: $(psrepo.apikey)
       inputs:
         targetType: 'filePath'
         filePath: .\Build\Start-Build.ps1

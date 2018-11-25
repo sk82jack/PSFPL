@@ -1,4 +1,4 @@
-function Connect-FPL {
+function Connect-Fpl {
     <#
     .SYNOPSIS
         Connect to the FPL API using provided login credentials
@@ -10,7 +10,9 @@ function Connect-FPL {
     .EXAMPLE
         Connect-FPL -Credential myname@email.com
     .LINK
-        https://github.com/sk82jack/PSFPL/
+        https://psfpl.readthedocs.io/en/latest/functions/Connect-Fpl
+    .LINK
+        https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Connect-FPL.ps1
     #>
     [Cmdletbinding()]
     Param (

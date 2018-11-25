@@ -35,7 +35,9 @@ function Get-FplPlayer {
 
         Retrieve the current dream team
     .LINK
-        https://github.com/sk82jack/PSFPL/
+        https://psfpl.readthedocs.io/en/latest/functions/Get-FplPlayer
+    .LINK
+        https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplPlayer.ps1
     #>
     [CmdletBinding(DefaultParameterSetName = 'Filter')]
     Param (

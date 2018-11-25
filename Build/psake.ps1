@@ -11,6 +11,10 @@ Properties {
     if ($ENV:BHCommitMessage -match "!verbose") {
         $Verbose = @{Verbose = $True}
     }
+
+    git config user.email 'sk82jack@hotmail.com'
+    git config user.name 'sk82jack'
+    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 }
 
 Task Default -Depends Test
@@ -20,6 +24,20 @@ Task Init {
     Set-Location $ENV:BHProjectPath
     "Build System Details:"
     Get-Item ENV:BH*
+    "`n"
+}
+
+Task SetBuildVersion -Depends Init {
+    $lines
+
+    "`n`tSetting build version"
+    $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
+    $ENV:BUILD_NAME | Out-File -FilePath $BuildVersionPath -Force
+
+    "`tPushing build version to GitHub"
+    git add $BuildVersionPath
+    git commit -m "Update build version ***NO_CI***"
+    git push $GitHubUrl HEAD.master
     "`n"
 }
 
@@ -56,17 +74,9 @@ Task Test -Depends Init {
     "`n"
 }
 
-Task BuildDocs -depends Test {
-    $DocFolder = "$env:BHModulePath\docs"
-    if (!(Test-Path $DocFolder)) {
-        New-Item -Path $DocFolder -ItemType Directory
-    }
-    Import-Module -Name $env:BHPSModuleManifest -Force
-    New-MarkdownHelp -Module $env:BHProjectName -OutputFolder $DocFolder
-}
-
-Task Build -Depends BuildDocs {
+Task Build -Depends Test {
     $lines
+    "`n"
 
     # Compile seperate ps1 files into the psm1
     $Stringbuilder = [System.Text.StringBuilder]::new()
@@ -77,25 +87,26 @@ Task Build -Depends BuildDocs {
             $Files = Get-ChildItem "$env:BHModulePath\$Folder\*.ps1"
             foreach ($File in $Files) {
                 $Name = $File.Name
-                "  Importing [.$Name]"
+                "`tImporting [.$Name]"
                 [void]$Stringbuilder.AppendLine("# .$Name")
                 [void]$Stringbuilder.AppendLine([System.IO.File]::ReadAllText($File.fullname))
             }
         }
-        "  Removing folder [$env:BHModulePath\$Folder]"
+        "`tRemoving folder [$env:BHModulePath\$Folder]"
         Remove-Item -Path "$env:BHModulePath\$Folder" -Recurse -Force
     }
     $ModulePath = Join-Path -Path $env:BHModulePath -ChildPath "$env:BHProjectName.psm1"
-    "  Creating module [$ModulePath]"
+    "`tCreating module [$ModulePath]"
     Set-Content -Path $ModulePath -Value $Stringbuilder.ToString()
 
     # Load the module, read the exported functions & aliases, update the psd1 FunctionsToExport & AliasesToExport
-    "  Setting module functions"
+    "`tSetting module functions"
     Set-ModuleFunctions
-    "  Setting module aliases"
+    "`tSetting module aliases"
     Set-ModuleAliases
 
     # Bump the module version if we didn't already
+    $ReleaseVersion =
     Try {
         $GalleryVersion = Find-NugetPackage -Name $env:BHProjectName -PackageSourceUrl 'http://psrepositorychi01.phe.gov.uk/nuget/PowerShell' -IsLatest -ErrorAction Stop
         $GitlabVersion = Get-MetaData -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -ErrorAction Stop
@@ -104,8 +115,55 @@ Task Build -Depends BuildDocs {
         }
     }
     Catch {
-        "Failed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
+        "`tFailed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
     }
+    "`n"
+}
+
+Task BuildDocs -depends Build {
+    $lines
+    Import-Module -Name $env:BHPSModuleManifest -Force
+    $DocFolder = "$env:BHModulePath\docs"
+    $YMLtext = (Get-Content "$env:BHModulePath\header-mkdocs.yml") -join "`n"
+    $YMLtext = "$YMLtext`n  - Change Log: ChangeLog.md`n"
+    $YMLText = "$YMLtext  - Functions:`n"
+
+    "`n`tRemoving old documentation"
+    $parameters = @{
+        Recurse     = $true
+        Force       = $true
+        Path        = "$DocFolder\functions"
+        ErrorAction = 'SilentlyContinue'
+    }
+    $null = Remove-Item @parameters
+
+    "`n`tBuilding documentation"
+    if (!(Test-Path $DocFolder)) {
+        New-Item -Path $DocFolder -ItemType Directory
+    }
+    $Params = @{
+        Module       = $ENV:BHProjectName
+        Force        = $true
+        OutputFolder = "$DocFolder\functions"
+        NoMetadata   = $true
+    }
+    New-MarkdownHelp @Params | foreach-object {
+        $Function = $_.Name -replace '\.md', ''
+        $Part = "    - {0}: functions/{1}" -f $Function, $_.Name
+        $YMLText = "{0}{1}`n" -f $YMLText, $Part
+        $Part
+    }
+    $YMLtext | Set-Content -Path "$env:BHModulePath\mkdocs.yml"
+    Copy-Item -Path "$env:BHModulePath\README.md" -Destination "$DocFolder\index.md" -Force
+    Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion ################################################################
+    Convertfrom-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
+
+    "`tPushing built docs to GitHub"
+    git add "$DocFolder\*"
+    git add "$env:BHModulePath\mkdocs.yml"
+    git add "$env:BHModulePath\CHANGELOG.md"
+    git commit -m "Update docs for release ***NO_CI***"
+    git push $GitHubUrl HEAD.master
     "`n"
 }
 
@@ -117,6 +175,6 @@ Task Deploy -Depends Build {
         Force   = $true
         Recurse = $false # We keep psdeploy artifacts, avoid deploying those : )
     }
-    "`nInvoking PSDeploy"
+    "`tInvoking PSDeploy"
     Invoke-PSDeploy @Verbose @Params
 }
