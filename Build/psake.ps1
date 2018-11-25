@@ -37,7 +37,7 @@ Task SetBuildVersion -Depends Init {
 
     "`tSetting build version"
     $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
-    $ENV:BUILD_NAME | Out-File -FilePath $BuildVersionPath -Force
+    "|Build Version|`n|---|`n|$ENV:BUILD_NAME|" | Out-File -FilePath $BuildVersionPath -Force
 
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
