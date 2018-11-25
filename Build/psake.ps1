@@ -35,9 +35,9 @@ Task SetBuildVersion -Depends Init {
     }
     $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 
-    "`n`tSetting build version"
+    "`tSetting build version"
     $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
-    $ENV:BUILD_NAME | Out-File -FilePath $BuildVersionPath -Force
+    "|Build Version|`n|---|`n|$ENV:BUILD_NAME|" | Out-File -FilePath $BuildVersionPath -Force
 
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
@@ -143,7 +143,7 @@ Task BuildDocs -depends Build {
     }
     $null = Remove-Item @parameters
 
-    "`n`tBuilding documentation"
+    "`tBuilding documentation"
     if (!(Test-Path $DocFolder)) {
         New-Item -Path $DocFolder -ItemType Directory
     }
@@ -164,7 +164,7 @@ Task BuildDocs -depends Build {
     Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion ################################################################
     Convertfrom-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
 
-    "`n`tSetting git repository url"
+    "`tSetting git repository url"
     if (!$ENV:GITHUB_PAT) {
         Write-Error "GitHub personal access token not found"
     }
