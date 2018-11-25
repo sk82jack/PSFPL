@@ -36,7 +36,8 @@ jobs:
       displayName: 'Set build version'
       condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       env:
-        BUILD_NAME: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+        BUILD_NAME: $(Build.BuildNumber)
+        GITHUB_PAT: $(github.pat)
       inputs:
         targetType: 'filePath'
         filePath: .\Build\Start-Build.ps1
