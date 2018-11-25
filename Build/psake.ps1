@@ -14,7 +14,6 @@ Properties {
 
     git config user.email 'sk82jack@hotmail.com'
     git config user.name 'sk82jack'
-    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 }
 
 Task Default -Depends Test
@@ -30,6 +29,12 @@ Task Init {
 Task SetBuildVersion -Depends Init {
     $lines
 
+    "`n`tSetting git repository url"
+    if (!$ENV:GITHUB_PAT) {
+        Write-Error "GitHub personal access token not found"
+    }
+    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
+
     "`n`tSetting build version"
     $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
     $ENV:BUILD_NAME | Out-File -FilePath $BuildVersionPath -Force
@@ -37,7 +42,8 @@ Task SetBuildVersion -Depends Init {
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
     git commit -m "Update build version ***NO_CI***"
-    git push $GitHubUrl HEAD.master
+    # --porcelain is to stop git sending output to stderr
+    git push $GitHubUrl HEAD:master --porcelain
     "`n"
 }
 
@@ -158,17 +164,29 @@ Task BuildDocs -depends Build {
     Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion ################################################################
     Convertfrom-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
 
+    "`n`tSetting git repository url"
+    if (!$ENV:GITHUB_PAT) {
+        Write-Error "GitHub personal access token not found"
+    }
+    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
+
     "`tPushing built docs to GitHub"
     git add "$DocFolder\*"
     git add "$env:BHModulePath\mkdocs.yml"
     git add "$env:BHModulePath\CHANGELOG.md"
     git commit -m "Update docs for release ***NO_CI***"
-    git push $GitHubUrl HEAD.master
+    # --porcelain is to stop git sending output to stderr
+    git push $GitHubUrl HEAD:master --porcelain
     "`n"
 }
 
 Task Deploy -Depends Build {
     $lines
+
+    "`n`tTesting for PowerShell Gallery API key"
+    if (!$ENV:GITHUB_PAT) {
+        Write-Error "PowerShell Gallery API key not found"
+    }
 
     $Params = @{
         Path    = "$ENV:BHProjectPath\Build"
