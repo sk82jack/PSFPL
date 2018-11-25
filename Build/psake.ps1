@@ -27,6 +27,20 @@ Task Init {
     "`n"
 }
 
+Task SetBuildVersion -Depends Init {
+    $lines
+
+    "`n`tSetting build version"
+    $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
+    $ENV:BUILD_NAME | Out-File -FilePath $BuildVersionPath -Force
+
+    "`tPushing build version to GitHub"
+    git add $BuildVersionPath
+    git commit -m "Update build version ***NO_CI***"
+    git push $GitHubUrl HEAD.master
+    "`n"
+}
+
 Task Test -Depends Init {
     $lines
     "`n`tSTATUS: Testing with PowerShell $PSVersion"
@@ -60,7 +74,53 @@ Task Test -Depends Init {
     "`n"
 }
 
-Task BuildDocs -depends Test {
+Task Build -Depends Test {
+    $lines
+    "`n"
+
+    # Compile seperate ps1 files into the psm1
+    $Stringbuilder = [System.Text.StringBuilder]::new()
+    $Folders = Get-ChildItem -Path $env:BHModulePath -Directory
+    foreach ($Folder in $Folders.Name) {
+        [void]$Stringbuilder.AppendLine("Write-Verbose 'Importing from [$env:BHModulePath\$Folder]'" )
+        if (Test-Path "$env:BHModulePath\$Folder") {
+            $Files = Get-ChildItem "$env:BHModulePath\$Folder\*.ps1"
+            foreach ($File in $Files) {
+                $Name = $File.Name
+                "`tImporting [.$Name]"
+                [void]$Stringbuilder.AppendLine("# .$Name")
+                [void]$Stringbuilder.AppendLine([System.IO.File]::ReadAllText($File.fullname))
+            }
+        }
+        "`tRemoving folder [$env:BHModulePath\$Folder]"
+        Remove-Item -Path "$env:BHModulePath\$Folder" -Recurse -Force
+    }
+    $ModulePath = Join-Path -Path $env:BHModulePath -ChildPath "$env:BHProjectName.psm1"
+    "`tCreating module [$ModulePath]"
+    Set-Content -Path $ModulePath -Value $Stringbuilder.ToString()
+
+    # Load the module, read the exported functions & aliases, update the psd1 FunctionsToExport & AliasesToExport
+    "`tSetting module functions"
+    Set-ModuleFunctions
+    "`tSetting module aliases"
+    Set-ModuleAliases
+
+    # Bump the module version if we didn't already
+    $ReleaseVersion =
+    Try {
+        $GalleryVersion = Find-NugetPackage -Name $env:BHProjectName -PackageSourceUrl 'http://psrepositorychi01.phe.gov.uk/nuget/PowerShell' -IsLatest -ErrorAction Stop
+        $GitlabVersion = Get-MetaData -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -ErrorAction Stop
+        if ($GalleryVersion.Version -ge $GitlabVersion) {
+            Step-ModuleVersion -Path $env:BHPSModuleManifest -By Build
+        }
+    }
+    Catch {
+        "`tFailed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
+    }
+    "`n"
+}
+
+Task BuildDocs -depends Build {
     $lines
     Import-Module -Name $env:BHPSModuleManifest -Force
     $DocFolder = "$env:BHModulePath\docs"
@@ -104,51 +164,6 @@ Task BuildDocs -depends Test {
     git add "$env:BHModulePath\CHANGELOG.md"
     git commit -m "Update docs for release ***NO_CI***"
     git push $GitHubUrl HEAD.master
-    "`n"
-}
-
-Task Build -Depends BuildDocs {
-    $lines
-    "`n"
-
-    # Compile seperate ps1 files into the psm1
-    $Stringbuilder = [System.Text.StringBuilder]::new()
-    $Folders = Get-ChildItem -Path $env:BHModulePath -Directory
-    foreach ($Folder in $Folders.Name) {
-        [void]$Stringbuilder.AppendLine("Write-Verbose 'Importing from [$env:BHModulePath\$Folder]'" )
-        if (Test-Path "$env:BHModulePath\$Folder") {
-            $Files = Get-ChildItem "$env:BHModulePath\$Folder\*.ps1"
-            foreach ($File in $Files) {
-                $Name = $File.Name
-                "`tImporting [.$Name]"
-                [void]$Stringbuilder.AppendLine("# .$Name")
-                [void]$Stringbuilder.AppendLine([System.IO.File]::ReadAllText($File.fullname))
-            }
-        }
-        "`tRemoving folder [$env:BHModulePath\$Folder]"
-        Remove-Item -Path "$env:BHModulePath\$Folder" -Recurse -Force
-    }
-    $ModulePath = Join-Path -Path $env:BHModulePath -ChildPath "$env:BHProjectName.psm1"
-    "`tCreating module [$ModulePath]"
-    Set-Content -Path $ModulePath -Value $Stringbuilder.ToString()
-
-    # Load the module, read the exported functions & aliases, update the psd1 FunctionsToExport & AliasesToExport
-    "`tSetting module functions"
-    Set-ModuleFunctions
-    "`tSetting module aliases"
-    Set-ModuleAliases
-
-    # Bump the module version if we didn't already
-    Try {
-        $GalleryVersion = Find-NugetPackage -Name $env:BHProjectName -PackageSourceUrl 'http://psrepositorychi01.phe.gov.uk/nuget/PowerShell' -IsLatest -ErrorAction Stop
-        $GitlabVersion = Get-MetaData -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -ErrorAction Stop
-        if ($GalleryVersion.Version -ge $GitlabVersion) {
-            Step-ModuleVersion -Path $env:BHPSModuleManifest -By Build
-        }
-    }
-    Catch {
-        "`tFailed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
-    }
     "`n"
 }
 
