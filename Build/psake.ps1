@@ -40,7 +40,7 @@ Task SetBuildVersion -Depends Init {
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
     git commit -m "Update build version ***NO_CI***"
-    git push $GitHubUrl master
+    git push $GitHubUrl HEAD:master
     "`n"
 }
 
@@ -166,7 +166,7 @@ Task BuildDocs -depends Build {
     git add "$env:BHModulePath\mkdocs.yml"
     git add "$env:BHModulePath\CHANGELOG.md"
     git commit -m "Update docs for release ***NO_CI***"
-    git push $GitHubUrl master
+    git push $GitHubUrl HEAD:master
     "`n"
 }
 
