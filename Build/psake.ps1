@@ -41,7 +41,7 @@ Task SetBuildVersion -Depends Init {
 
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
-    git commit -m "Update build version ***NO_CI***"
+    git commit -m "Bump build version`n***NO_CI***"
     # --porcelain is to stop git sending output to stderr
     git push $GitHubUrl HEAD:master --porcelain
     "`n"
@@ -111,18 +111,15 @@ Task Build -Depends Test {
     "`tSetting module aliases"
     Set-ModuleAliases
 
-    # Bump the module version if we didn't already
-    $ReleaseVersion =
-    Try {
-        $GalleryVersion = Find-NugetPackage -Name $env:BHProjectName -PackageSourceUrl 'http://psrepositorychi01.phe.gov.uk/nuget/PowerShell' -IsLatest -ErrorAction Stop
-        $GitlabVersion = Get-MetaData -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -ErrorAction Stop
-        if ($GalleryVersion.Version -ge $GitlabVersion) {
-            Step-ModuleVersion -Path $env:BHPSModuleManifest -By Build
-        }
+    # Set the module version from the release tag
+    "`tUpdating the module manifest with the new version number"
+    [version]$ReleaseVersion = git describe --tags
+    $GalleryVersion = Get-NextNugetPackageVersion -Name $env:BHProjectName -ErrorAction Stop
+    if ($ReleaseVersion -le $GalleryVersion) {
+        Write-Error "Gallery version is higher than the release version. The release version must be increased"
     }
-    Catch {
-        "`tFailed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
-    }
+    Update-Metadata -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -Value $ReleaseVersion -ErrorAction stop
+    git add $env:BHPSModuleManifest
     "`n"
 }
 
@@ -161,7 +158,9 @@ Task BuildDocs -depends Build {
     }
     $YMLtext | Set-Content -Path "$env:BHModulePath\mkdocs.yml"
     Copy-Item -Path "$env:BHModulePath\README.md" -Destination "$DocFolder\index.md" -Force
-    Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion ################################################################
+
+    [version]$ReleaseVersion = git describe --tags
+    Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion $ReleaseVersion
     Convertfrom-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
 
     "`tSetting git repository url"
@@ -174,7 +173,7 @@ Task BuildDocs -depends Build {
     git add "$DocFolder\*"
     git add "$env:BHModulePath\mkdocs.yml"
     git add "$env:BHModulePath\CHANGELOG.md"
-    git commit -m "Update docs for release ***NO_CI***"
+    git commit -m "Bump version to $ReleaseVersion`n***NO_CI***"
     # --porcelain is to stop git sending output to stderr
     git push $GitHubUrl HEAD:master --porcelain
     "`n"
