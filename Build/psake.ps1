@@ -158,7 +158,9 @@ Task BuildDocs -depends Build {
     }
     $YMLtext | Set-Content -Path "$env:BHModulePath\mkdocs.yml"
     Copy-Item -Path "$env:BHModulePath\README.md" -Destination "$DocFolder\index.md" -Force
-    Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion ################################################################
+
+    [version]$ReleaseVersion = git describe --tags
+    Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion $ReleaseVersion
     Convertfrom-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
 
     "`tSetting git repository url"
@@ -166,7 +168,6 @@ Task BuildDocs -depends Build {
         Write-Error "GitHub personal access token not found"
     }
     $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
-    [version]$ReleaseVersion = git describe --tags
 
     "`tPushing built docs to GitHub"
     git add "$DocFolder\*"
