@@ -41,7 +41,7 @@ Task SetBuildVersion -Depends Init {
 
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
-    git commit -m "Update build version ***NO_CI***"
+    git commit -m "Bump build version`n***NO_CI***"
     # --porcelain is to stop git sending output to stderr
     git push $GitHubUrl HEAD:master --porcelain
     "`n"
