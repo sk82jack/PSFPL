@@ -25,11 +25,11 @@ InModuleScope 'PSFPL' {
                 }
                 $Result = ConvertTo-FplObject -InputObject $Object -Type FplPlayer
             }
+            It 'Outputs an FplPlayer object' {
+                $Result.PSTypeNames | Should -Contain 'FplPlayer'
+            }
             It 'Converts diacritic characters' {
                 $Result.WebName | Should -Be 'Bellerin'
-            }
-            It 'Outputs an FplPlayer object' {
-                $Result.psobject.TypeNames | Should -Contain 'FplPlayer'
             }
             It 'Converts property names to Pascal Case' {
                 $Result.psobject.properties.Name | Should -Be @('WebName', 'Position', 'Price', 'Club', 'NowCost', 'ElementType', 'Team')
@@ -39,6 +39,25 @@ InModuleScope 'PSFPL' {
             }
             It 'Converts team ID to club name' {
                 $Result.Club | Should -Be 'Arsenal'
+            }
+        }
+        Context 'FplGameweek type' {
+            BeforeAll {
+                $Object = [PSCustomObject]@{
+                    id                  = 1
+                    deadline_time       = '08/10/2018 18:00:00'
+                    average_entry_score = 53
+                }
+                $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplGameweek'
+            }
+            It 'Outputs an FplGameweek object' {
+                $Result.PSTypeNames | Should -Contain 'FplGameweek'
+            }
+            It 'Converts "Entry" in a property name to "Team"' {
+                $Result.psobject.properties.name | Should -Contain 'AverageTeamScore'
+            }
+            It 'Converts DeadlineTime to a DateTime object' {
+                $Result.DeadlineTime | Should -BeOfType [DateTime]
             }
         }
     }
