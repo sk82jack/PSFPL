@@ -21,7 +21,7 @@ function ConvertTo-FplObject {
         $InputObject,
 
         [Parameter(Mandatory)]
-        [ValidateSet('FplPlayer')]
+        [ValidateSet('FplPlayer', 'FplGameweek')]
         [string]
         $Type
     )
@@ -36,7 +36,7 @@ function ConvertTo-FplObject {
     foreach ($Object in $InputObject) {
         $Hashtable = @{}
         $Object.psobject.properties | Foreach-Object {
-            $Name = $TextInfo.ToTitleCase($_.Name) -replace '_'
+            $Name = $TextInfo.ToTitleCase($_.Name) -replace '_' -replace 'Entry', 'Team'
             $Value = if ($_.Value -is [string]) {
                 $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
                 [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($DiacriticName))
@@ -53,10 +53,11 @@ function ConvertTo-FplObject {
                 $Hashtable['Club'] = $TeamHash[$Object.team]
                 $Hashtable['Price'] = $Object.now_cost / 10
             }
+            'FplGameweek' {
+                $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
+            }
         }
-
-        $FplObject = [pscustomobject]$Hashtable
-        $FplObject.PSObject.TypeNames.Insert(0, $Type)
-        $FplObject
+        $Hashtable['PsTypeName'] = $Type
+        [pscustomobject]$Hashtable
     }
 }
