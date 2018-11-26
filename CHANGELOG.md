@@ -19,5 +19,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/sk82jack/PSFPL/compare/1.0.0...HEAD
 
