@@ -40,7 +40,7 @@ function ConvertTo-FplObject {
     foreach ($Object in $InputObject) {
         $Hashtable = [ordered]@{}
         $Object.psobject.properties | Foreach-Object {
-            $Name = $TextInfo.ToTitleCase($_.Name) -replace '_' -replace 'Team', 'Club' -replace 'Entry', 'Team'
+            $Name = $TextInfo.ToTitleCase($_.Name) -replace '_' -replace 'Team', 'Club' -replace 'Entry', 'Team' -replace 'Event', 'Gameweek'
             $Value = if ($_.Value -is [string]) {
                 $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
                 [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($DiacriticName))
