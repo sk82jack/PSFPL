@@ -54,6 +54,7 @@ function ConvertTo-FplObject {
         switch ($Type) {
             'FplPlayer' {
                 $Hashtable['Position'] = $PositionHash[$Object.element_type]
+                $Hashtable['ClubId'] = $Object.Club
                 $Hashtable['Club'] = $TeamHash[$Object.team]
                 $Hashtable['Price'] = $Object.now_cost / 10
             }
