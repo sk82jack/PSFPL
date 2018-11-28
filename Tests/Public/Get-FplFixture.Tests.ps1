@@ -9,19 +9,19 @@ InModuleScope 'PSFPL' {
                         ClubH       = 'Man Utd'
                         ClubA       = 'Leicester'
                         Gameweek    = 1
-                        KickoffTime = Get-Date '10/08/2018 20:00:00'
+                        KickoffTime = Get-Date '08/10/2018 18:00:00'
                     },
                     [pscustomobject]@{
                         ClubH       = 'Liverpool'
                         ClubA       = 'Everton'
                         Gameweek    = 1
-                        KickoffTime = Get-Date '12/08/2018 13:30:00'
+                        KickoffTime = Get-Date '08/11/2018 11:30:00'
                     },
                     [pscustomobject]@{
                         ClubH       = 'Crystal Palace'
                         ClubA       = 'Liverpool'
                         Gameweek    = 2
-                        KickoffTime = Get-Date '20/08/2018 20:00:00'
+                        KickoffTime = Get-Date '08/20/2018 19:00:00'
                     }
                 )
             }
