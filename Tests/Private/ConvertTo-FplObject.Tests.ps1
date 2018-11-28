@@ -32,7 +32,7 @@ InModuleScope 'PSFPL' {
                 $Result.WebName | Should -Be 'Bellerin'
             }
             It 'Converts property names to Pascal Case' {
-                $Result.psobject.properties.Name | Should -Be @('WebName', 'Position', 'Price', 'Club', 'NowCost', 'ElementType', 'Team')
+                $Result.psobject.properties.Name | Should -Be @('WebName', 'ElementType', 'Club', 'NowCost', 'Position', 'ClubId', 'Price')
             }
             It 'Converts element type to position' {
                 $Result.Position | Should -Be 'Defender'
