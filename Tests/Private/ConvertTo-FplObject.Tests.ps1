@@ -32,7 +32,7 @@ InModuleScope 'PSFPL' {
                 $Result.WebName | Should -Be 'Bellerin'
             }
             It 'Converts property names to Pascal Case' {
-                $Result.psobject.properties.Name | Should -Be @('WebName', 'Position', 'Price', 'Club', 'NowCost', 'ElementType', 'Team')
+                $Result.psobject.properties.Name | Should -Be @('WebName', 'ElementType', 'Club', 'NowCost', 'Position', 'ClubId', 'Price')
             }
             It 'Converts element type to position' {
                 $Result.Position | Should -Be 'Defender'
@@ -58,6 +58,96 @@ InModuleScope 'PSFPL' {
             }
             It 'Converts DeadlineTime to a DateTime object' {
                 $Result.DeadlineTime | Should -BeOfType [DateTime]
+            }
+        }
+        Context 'FplFixture type' {
+            BeforeAll {
+                $Object = [PSCustomObject]@{
+                    event         = 1
+                    deadline_time = '2018-08-10T18:00:00Z'
+                    kickoff_time  = '2018-08-10T19:00:00Z'
+                    team_a        = 1
+                    team_h        = 2
+                    stats         = @(
+                        [pscustomobject]@{
+                            goals_scored = [pscustomobject]@{
+                                a = @(
+                                    [pscustomobject]@{
+                                        value   = 1
+                                        element = 234
+                                    }
+                                )
+                                h = @(
+                                    [pscustomobject]@{
+                                        value   = 1
+                                        element = 286
+                                    },
+                                    [pscustomobject]@{
+                                        value   = 1
+                                        element = 302
+                                    }
+                                )
+                            }
+                        }
+                    )
+                }
+
+                Mock Get-FplClubId {
+                    @{
+                        1 = 'Leicester'
+                        2 = 'Man Utd'
+                    }
+                }
+
+                Mock Get-FplElementId {
+                    @{
+                        234 = 'Vardy'
+                        286 = 'Shaw'
+                        302 = 'Pogba'
+                    }
+                }
+
+                $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplFixture'
+            }
+            It 'Changes "Event" to "Gameweek" in property names' {
+                $Result.psobject.properties.Name | Should -Contain 'Gameweek'
+                $Result.psobject.properties.Name | Should -Not -Contain 'Event'
+            }
+            It 'Converts DeadlineTime to a DateTime object' {
+                $Result.DeadlineTime | Should -BeOfType [DateTime]
+            }
+            It 'Converts KickoffTime to a DateTime object' {
+                $Result.KickoffTime | Should -BeOfType [DateTime]
+            }
+            It 'Converts team ID to name' {
+                $Result.Stats[0].ClubName | Should -Be 'Leicester'
+                $Result.Stats[1].ClubName | Should -Be 'Man Utd'
+            }
+            It 'Flattens the nested stats property' {
+                $Result.Stats[0].psobject.Properties.Name | Should -Be  @(
+                    'PlayerId',
+                    'PlayerName',
+                    'StatType',
+                    'StatValue',
+                    'ClubName'
+                )
+            }
+            It 'Converts stats player ID to name' {
+                $Result.Stats.PlayerName | Should -Be @(
+                    'Vardy',
+                    'Shaw',
+                    'Pogba'
+                )
+            }
+            It 'Removes underscores from stat types' {
+                $Result.Stats.StatType | Should -Not -Match '_'
+            }
+            It 'Converts stats club ID to name' {
+                $Result.Stats.ClubName | Should -Be @(
+                    'Leicester',
+                    'Man Utd',
+                    'Man Utd'
+                )
             }
         }
     }
