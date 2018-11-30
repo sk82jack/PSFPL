@@ -20,7 +20,6 @@ function Connect-Fpl {
         [pscredential]
         $Credential
     )
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Uri = 'https://users.premierleague.com/accounts/login/'
 
     $LoginResponse = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -UseBasicParsing
