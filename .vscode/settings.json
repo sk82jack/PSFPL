@@ -6,6 +6,7 @@
   "editor.tabSize": 4,
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
+  "files.defaultLanguage": "powershell",
   "[json]": {
     "editor.tabSize": 2
   }
