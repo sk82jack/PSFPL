@@ -130,5 +130,54 @@
                 </TableRowEntries>
             </TableControl>
         </View>
+        <View>
+            <Name>FplLeagueTable</Name>
+            <ViewSelectedBy>
+                <TypeName>FplLeagueTable</TypeName>
+            </ViewSelectedBy>
+            <GroupBy>
+                <PropertyName>LeagueName</PropertyName>
+            </GroupBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Alignment>right</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>right</Alignment>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Rank</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>TeamName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>PlayerName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>GameWeekTotal</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Total</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
     </ViewDefinitions>
 </Configuration>
