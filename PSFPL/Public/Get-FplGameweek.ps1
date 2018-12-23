@@ -19,16 +19,27 @@ function Get-FplGameweek {
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplGameweek.ps1
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Gameweek')]
     param (
-        [Parameter()]
+        [Parameter(
+            ParameterSetName = 'Gameweek',
+            ValueFromPipeline
+        )]
         [int]
-        $Gameweek
+        $Gameweek,
+
+        [Parameter(ParameterSetName = 'Current')]
+        [switch]
+        $Current
     )
 
     $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/events/' -UseBasicParsing
     $Gameweeks = ConvertTo-FplObject -InputObject $Response -Type 'FplGameweek'
-    if ($Gameweek -gt 0) {
+
+    if ($Current) {
+        $Gameweeks.Where{$_.IsCurrent}
+    }
+    elseif ($Gameweek -gt 0) {
         $Gameweeks.Where{$_.Id -eq $Gameweek}
     }
     else {
