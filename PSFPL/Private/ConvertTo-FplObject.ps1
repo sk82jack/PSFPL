@@ -21,7 +21,7 @@ function ConvertTo-FplObject {
         $InputObject,
 
         [Parameter(Mandatory)]
-        [ValidateSet('FplPlayer', 'FplGameweek', 'FplFixture')]
+        [ValidateSet('FplPlayer', 'FplGameweek', 'FplFixture', 'FplLeagueTable')]
         [string]
         $Type
     )
@@ -33,6 +33,10 @@ function ConvertTo-FplObject {
         'FplFixture' {
             $TeamHash = Get-FplClubId
             $PlayerHash = Get-FplElementId
+        }
+        'FplLeagueTable' {
+            $LeagueName = $InputObject[0].league.name
+            $InputObject = $InputObject.foreach{$_.standings.results}
         }
     }
 
@@ -81,6 +85,13 @@ function ConvertTo-FplObject {
                         }
                     }
                 }
+            }
+            'FplLeagueTable' {
+                $Hashtable['LeagueName'] = $LeagueName
+                $Hashtable['LeagueId'] = $Hashtable['League']
+                $Hashtable.Remove('League')
+                $Hashtable['TeamId'] = $Hashtable['Team']
+                $Hashtable.Remove('Team')
             }
         }
         $Hashtable['PsTypeName'] = $Type

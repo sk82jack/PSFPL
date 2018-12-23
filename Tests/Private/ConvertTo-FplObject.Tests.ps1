@@ -150,5 +150,48 @@ InModuleScope 'PSFPL' {
                 )
             }
         }
+        Context 'FplLeagueTable type' {
+            BeforeAll {
+                $Object = @(
+                    [PSCustomObject]@{
+                        league    = [PSCustomObject]@{
+                            name = 'MyCustomLeague'
+                        }
+                        standings = [PSCustomObject]@{
+                            has_next = $false
+                            results  = [PSCustomObject]@{
+                                league = 12345
+                                entry  = 54321
+                            }
+                        }
+                    },
+                    [PSCustomObject]@{
+                        league    = [PSCustomObject]@{
+                            name = 'MyCustomLeague'
+                        }
+                        standings = [PSCustomObject]@{
+                            has_next = $false
+                            results  = [PSCustomObject]@{
+                                league = 12345
+                                entry  = 65432
+                            }
+                        }
+                    }
+                )
+
+                $Results = ConvertTo-FplObject -InputObject $Object -Type 'FplLeagueTable'
+            }
+            It 'adds the LeagueName property' {
+                $Results | Foreach-Object {$_.LeagueName | Should -Be 'MyCustomLeague'}
+            }
+            It 'renames the League property to LeagueId' {
+                $Results | Foreach-Object {$_.League | Should -BeNullOrEmpty}
+                $Results.LeagueId | Should -Contain 12345
+            }
+            It 'renames the Team property to TeamId' {
+                $Results | Foreach-Object {$_.Team | Should -BeNullOrEmpty}
+                $Results.TeamId | Should -Be 54321, 65432
+            }
+        }
     }
 }
