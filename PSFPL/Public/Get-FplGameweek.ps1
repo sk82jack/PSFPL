@@ -6,6 +6,8 @@ function Get-FplGameweek {
         Retrieves a list of FPL gameweeks
     .PARAMETER Gameweek
         Retrieve a specific gameweek by it's number
+    .Parameter Current
+        Retrieves the current gameweek
     .EXAMPLE
         Get-FplGameweek
 
@@ -14,6 +16,14 @@ function Get-FplGameweek {
         Get-FplGameweek -Gameweek 14
 
         This will list only gameweek 14
+    .EXAMPLE
+        9 | Get-FplGameweek
+
+        This will list only gameweek 9
+    .EXAMPLE
+        Get-FplGameweek -Current
+
+        This will list only the current gameweek
     .LINK
         https://psfpl.readthedocs.io/en/latest/functions/Get-FplGameweek
     .LINK
