@@ -1,4 +1,22 @@
 function Get-FplLeagueTable {
+    <#
+    .SYNOPSIS
+        Retrieves an FPL league table
+    .DESCRIPTION
+        Retrieves an FPL league table given a league ID and league type
+    .PARAMETER Id
+        An FPL league Id
+    .Parameter Type
+        An FPL league type. This can either be 'Classic' or 'HeadToHead'
+    .EXAMPLE
+        Get-FplLeagueTable -Id 12345 -Type Classic
+
+        This will show the league standings for the classic league of ID 12345
+    .LINK
+        https://psfpl.readthedocs.io/en/latest/functions/Get-FplLeagueTable
+    .LINK
+        https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplLeagueTable.ps1
+    #>
     [CmdletBinding()]
     param (
         [Parameter()]
