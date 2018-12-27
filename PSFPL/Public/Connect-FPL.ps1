@@ -23,7 +23,6 @@ function Connect-Fpl {
     $Uri = 'https://users.premierleague.com/accounts/login/'
 
     $LoginResponse = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -UseBasicParsing
-    $Script:FPLSession = $FplSession
 
     $CsrfToken = $LoginResponse.InputFields.Where{$_.name -eq 'csrfmiddlewaretoken'}.value
 
@@ -35,7 +34,9 @@ function Connect-Fpl {
         'redirect_uri'        = 'https://fantasy.premierleague.com/a/login'
     }
 
-    if ($Response.Headers.'Set-Cookie' -notmatch 'sessionid=') {
+    if (-not ($Response.Headers.'Set-Cookie' -match 'sessionid=')) {
         Throw 'Invalid credentials'
     }
+
+    $Script:FplSession = $FplSession
 }
