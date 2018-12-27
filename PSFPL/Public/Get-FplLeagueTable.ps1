@@ -4,7 +4,7 @@ function Get-FplLeagueTable {
         Retrieves an FPL league table
     .DESCRIPTION
         Retrieves an FPL league table given a league ID and league type
-    .PARAMETER Id
+    .PARAMETER LeagueId
         An FPL league Id
     .Parameter Type
         An FPL league type. This can either be 'Classic' or 'HeadToHead'
