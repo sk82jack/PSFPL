@@ -21,7 +21,7 @@ function Get-FplLeagueTable {
     param (
         [Parameter()]
         [int]
-        $Id,
+        $LeagueId,
 
         [Parameter()]
         [ValidateSet('Classic', 'HeadToHead')]
