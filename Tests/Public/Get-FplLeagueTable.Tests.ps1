@@ -19,7 +19,7 @@ InModuleScope 'PSFPL' {
             Mock ConvertTo-FplObject {$true}
         }
         It 'loops through all the league standing pages' {
-            $Results = Get-FplLeagueTable -Id 12345 -Type 'Classic'
+            $Results = Get-FplLeagueTable -LeagueId 12345 -Type 'Classic'
             Assert-MockCalled Invoke-RestMethod 2 -Scope It
         }
     }

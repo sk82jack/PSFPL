@@ -193,5 +193,39 @@ InModuleScope 'PSFPL' {
                 $Results.TeamId | Should -Be 54321, 65432
             }
         }
+        Context 'FplTeam type' {
+            BeforeAll {
+                Mock Get-FplClubId {
+                    @{
+                        6 = 'Chelsea'
+                    }
+                }
+                $Object = [PSCustomObject]@{
+                    bank          = 13
+                    value         = 1013
+                    favouriteteam = 6
+                    id            = 123456
+                    player        = 987654321
+                }
+                $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplTeam'
+            }
+            It 'divides the bank property by 10' {
+                $Result.Bank | Should -Be 1.3
+            }
+            It 'divides the value property by 10' {
+                $Result.Value | Should -Be 101.3
+            }
+            It 'replaces favourite team ID with name' {
+                $Result.FavouriteClub | Should -Be 'Chelsea'
+            }
+            It 'renames the Id property to TeamId' {
+                $Result.Id | Should -BeNullOrEmpty
+                $Result.TeamId | Should -Be 123456
+            }
+            It 'renames the Player property to PlayerId' {
+                $Result.Player | Should -BeNullOrEmpty
+                $Result.PlayerId | Should -Be 987654321
+            }
+        }
     }
 }
