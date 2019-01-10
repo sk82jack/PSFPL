@@ -46,14 +46,30 @@ InModuleScope 'PSFPL' {
         }
         Context 'Execution' {
             It 'throws a terminating error if bad credentials are given' {
+                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
                 {Connect-FPL -Credential $BadCreds} | Should -Throw
             }
-            It "doesn't throw a terminating error if bad credentials are given" {
+            It "doesn't throw a terminating error if good credentials are given" {
+                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
                 {Connect-FPL -Credential $GoodCreds} | Should -Not -Throw
+            }
+            It "doesn't connect if an existing connection exists" {
+                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
+                Connect-FPL -Credential $GoodCreds
+                $Response = Connect-FPL -Credential $GoodCreds 3>&1
+                $Response.Message | Should -Be 'A connection already exists. Use the Force parameter to connect.'
+            }
+            It "connects if an existing connection exists but we use the force parameter" {
+                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
+                Connect-FPL -Credential $GoodCreds
+                $Response = Connect-FPL -Credential $GoodCreds -Force 3>&1
+                $Response.Message | Should -BeNullOrEmpty
             }
         }
         Context 'Output' {
             It 'adds the FPL session is available within the module scope' {
+                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
+                Connect-FPL -Credential $GoodCreds
                 $FplSession | Should -Not -BeNullOrEmpty
                 $FplSession | Should -BeOfType 'Microsoft.PowerShell.Commands.WebRequestSession'
             }
