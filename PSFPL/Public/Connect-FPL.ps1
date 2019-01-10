@@ -7,8 +7,12 @@ function Connect-Fpl {
         This is required for some functions which pull data related to your account
     .PARAMETER Credential
         Your FPL credentials that you use to log into https://fantasy.premierleague.com
+    .PARAMETER Force
+        Create a connection regardless of whether there is already an existing connection
     .EXAMPLE
         Connect-FPL -Credential myname@email.com
+    .EXAMPLE
+        Connect-FPL -Credential myname@email.com -Force
     .LINK
         https://psfpl.readthedocs.io/en/latest/functions/Connect-Fpl
     .LINK
@@ -18,12 +22,20 @@ function Connect-Fpl {
     Param (
         [Parameter(Mandatory)]
         [pscredential]
-        $Credential
+        $Credential,
+
+        [Parameter()]
+        [switch]
+        $Force
     )
+
+    if ($Script:FplSession -and -not $Force) {
+        Write-Warning "A connection already exists. Use the Force parameter to connect."
+        return
+    }
+
     $Uri = 'https://users.premierleague.com/accounts/login/'
-
     $LoginResponse = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -UseBasicParsing
-
     $CsrfToken = $LoginResponse.InputFields.Where{$_.name -eq 'csrfmiddlewaretoken'}.value
 
     $Response = Invoke-WebRequest -Uri $Uri -WebSession $FplSession -Method 'Post' -UseBasicParsing -Body @{
