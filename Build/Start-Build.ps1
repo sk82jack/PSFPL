@@ -16,7 +16,7 @@ if (-not (Get-Module -ListAvailable PSDepend)) {
 Import-Module PSDepend
 $null = Invoke-PSDepend -Path "$PSScriptRoot\build.requirements.psd1" -Install -Import -Force
 
-Set-BuildEnvironment
+Set-BuildEnvironment -Force
 
 Write-Output "  Invoke Psake"
 Invoke-psake -buildFile $PSScriptRoot\psake.ps1 -taskList $Task -nologo
