@@ -227,5 +227,30 @@ InModuleScope 'PSFPL' {
                 $Result.PlayerId | Should -Be 987654321
             }
         }
+        Context 'FplLeague' {
+            BeforeAll {
+                $Object = [PSCustomObject]@{
+                    classic = [PSCustomObject]@{
+                        Name = 'Classic League'
+                    }
+                    h2h     = @(
+                        [PSCustomObject]@{
+                            Name = 'cup'
+                        },
+                        [PSCustomObject]@{
+                            Name = 'H2H League'
+                        }
+                    )
+                }
+
+                $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplLeague'
+            }
+            It 'outputs an FPLLeague object' {
+                $Result[0].PSTypeNames | Should -Contain 'FplLeague'
+            }
+            It 'adds the classic and h2h leagues together leaving out the cup' {
+                $Result.Name | Should -Be 'Classic League', 'H2H League'
+            }
+        }
     }
 }

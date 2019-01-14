@@ -1,9 +1,6 @@
 Import-Module $ENV:BHPSModuleManifest -Force
 InModuleScope 'PSFPL' {
     Describe 'Get-FplTeam' {
-        BeforeAll {
-            Mock ConvertTo-FplObject {$true}
-        }
         Context 'TeamId passed' {
             BeforeAll {
                 Mock Invoke-RestMethod {
@@ -11,34 +8,29 @@ InModuleScope 'PSFPL' {
                         entry = $true
                     }
                 }
-                $Results = Get-FplTeam -TeamId 101298
+                Mock ConvertTo-FplObject {}
+                $Results = Get-FplTeam -TeamId 123456
             }
             It 'passes the TeamId onto Invoke-RestMethod' {
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -match '101298$'}
+                Assert-MockCalled Invoke-RestMethod
             }
         }
         Context 'No TeamID whilst not logged in' {
             BeforeAll {
-                Mock Invoke-RestMethod {$true}
-                $Results = Get-FplTeam -WarningAction SilentlyContinue
+                $Result = Get-FplTeam 3>&1
             }
-            It 'returns no output' {
-                $Result | Should -BeNullOrEmpty
-                Assert-MockCalled Invoke-RestMethod -Exactly 0
+            It 'returns a warning' {
+                $Result.Message | Should -Be 'Please either login with the Connect-FPL function or specify a team ID'
             }
         }
         Context 'No TeamId whilst logged in' {
             BeforeAll {
-                Mock Invoke-RestMethod {
-                    [PSCustomObject]@{
-                        entry = $true
-                    }
-                }
+                Mock Get-FplUserTeam {}
                 $Script:FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
                 $Results = Get-FplTeam
             }
-            It 'uses the transfers URL when no parameter is given' {
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -match 'transfers$'}
+            It 'calls Get-FplUserTeam when no parameter is given' {
+                Assert-MockCalled Get-FplUserTeam
             }
         }
     }
