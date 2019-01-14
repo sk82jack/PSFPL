@@ -42,7 +42,7 @@ function ConvertTo-FplObject {
             $TeamHash = Get-FplClubId
         }
         'FplLeague' {
-            $InputObject = $InputObject.classic + @($InputObject.h2h).where{$_.name -ne 'cup'}
+            $InputObject = @($InputObject.classic) + @($InputObject.h2h).where{$_.name -ne 'cup'}
         }
     }
 
