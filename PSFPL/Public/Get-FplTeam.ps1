@@ -29,6 +29,10 @@ function Get-FplTeam {
 
     if ($TeamId -gt 0) {
         $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/entry/$TeamId" -UseDefaultCredentials
+        if ($Response -match 'The game is being updated.') {
+            Write-Warning 'The game is being updated. Please try again shortly.'
+            return
+        }
         ConvertTo-FplObject -InputObject $Response.entry -Type 'FplTeam'
     }
     elseif ($script:FplSession) {

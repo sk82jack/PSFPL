@@ -33,6 +33,10 @@ function Get-FplLeagueTable {
         $Page += 1
         $Url = 'https://fantasy.premierleague.com/drf/leagues-{0}-standings/{1}?phase=1&le-page=1&ls-page={2}' -f $Type.ToLower(), $Id, $Page
         $Response = Invoke-RestMethod -Uri $Url -UseBasicParsing
+        if ($Response -match 'The game is being updated.') {
+            Write-Warning 'The game is being updated. Please try again shortly.'
+            return
+        }
         $Response
     }
     until (-not $Response.standings.has_next)

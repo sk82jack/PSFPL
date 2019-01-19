@@ -72,6 +72,10 @@ function Get-FplPlayer {
     )
     Begin {
         $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/elements/' -UseBasicParsing
+        if ($Response -match 'The game is being updated.') {
+            Write-Warning 'The game is being updated. Please try again shortly.'
+            return
+        }
         $Players = ConvertTo-FplObject -InputObject $Response -Type 'FplPlayer' | Sort-Object TotalPoints, Price -Descending
     }
     Process {
