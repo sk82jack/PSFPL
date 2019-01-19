@@ -40,5 +40,9 @@ function Get-FplLeague {
     }
 
     $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/entry/$TeamId" -UseDefaultCredentials
+    if ($Response -match 'The game is being updated.') {
+        Write-Warning 'The game is being updated. Please try again shortly.'
+        return
+    }
     ConvertTo-FplObject -InputObject $Response.leagues -Type 'FplLeague'
 }
