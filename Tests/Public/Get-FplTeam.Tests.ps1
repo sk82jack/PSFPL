@@ -9,18 +9,34 @@ InModuleScope 'PSFPL' {
                     }
                 }
                 Mock ConvertTo-FplObject {}
-                $Results = Get-FplTeam -TeamId 123456
             }
             It 'passes the TeamId onto Invoke-RestMethod' {
-                Assert-MockCalled Invoke-RestMethod
+                $Results = Get-FplTeam -TeamId 123456
+                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456'} -Scope 'It'
+            }
+            It 'accepts pipeline input' {
+                $Results = 123456 | Get-FplTeam
+                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456'} -Scope 'It'
             }
         }
         Context 'No TeamID whilst not logged in' {
             BeforeAll {
-                $Result = Get-FplTeam 3>&1
+                Mock Invoke-RestMethod {}
+                Mock Get-Credential {
+                    $Password = ConvertTo-SecureString 'password' -AsPlainText -Force
+                    [Management.Automation.PSCredential]::new('UserName', $Password)
+                }
+                Mock Connect-Fpl {}
+                Mock Get-FplUserTeam {'12345'}
             }
             It 'returns a warning' {
-                $Result.Message | Should -Be 'Please either login with the Connect-FPL function or specify a team ID'
+                $Result = Get-FplTeam 3>&1
+                $Result.Message | Should -Contain 'No existing connection found'
+            }
+            It "connects to the FPL API and returns the user's team" {
+                $Result = Get-FplTeam -WarningAction SilentlyContinue
+                Assert-MockCalled Connect-Fpl -Scope 'It'
+                $Result | Should -Be '12345'
             }
         }
         Context 'No TeamId whilst logged in' {

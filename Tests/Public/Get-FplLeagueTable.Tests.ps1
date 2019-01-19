@@ -22,6 +22,16 @@ InModuleScope 'PSFPL' {
             $Results = Get-FplLeagueTable -LeagueId 12345 -Type 'Classic'
             Assert-MockCalled Invoke-RestMethod 2 -Scope It
         }
+        It 'processes pipeline input for an FplLeague object' {
+            $League = [PSCustomObject]@{
+                PSTypeName = 'FplLeague'
+                LeagueId   = 56789
+                Scoring    = 'H2H'
+            }
+
+            $League | Get-FplLeagueTable
+            Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/leagues-h2h-standings/56789?phase=1&le-page=1&ls-page=1'}
+        }
         Context 'When the game is updating' {
             BeforeAll {
                 Mock Invoke-RestMethod -ParameterFilter {$Uri -match 'page=1$'} {'The game is being updated.'}

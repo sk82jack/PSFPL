@@ -53,7 +53,7 @@ function ConvertTo-FplObject {
             $Name = $TextInfo.ToTitleCase($_.Name) -replace '_' -replace 'Team', 'Club' -replace 'Entry', 'Team' -replace 'Event', 'Gameweek'
             $Value = if ($_.Value -is [string]) {
                 $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
-                [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($DiacriticName))
+                [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($DiacriticName)).trim()
             }
             else {
                 $_.Value
@@ -70,6 +70,8 @@ function ConvertTo-FplObject {
             }
             'FplGameweek' {
                 $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
+                $Hashtable['Gameweek'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
             }
             'FplFixture' {
                 $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
@@ -102,13 +104,27 @@ function ConvertTo-FplObject {
             'FplTeam' {
                 $Hashtable['Bank'] = $Hashtable['Bank'] / 10
                 $Hashtable['Value'] = $Hashtable['Value'] / 10
-                $Hashtable['FavouriteClub'] = $TeamHash[$Hashtable['FavouriteClub']]
+                if ($Hashtable['FavouriteClub']) {
+                    $Hashtable['FavouriteClub'] = $TeamHash[$Hashtable['FavouriteClub']]
+                }
                 $Hashtable['TeamId'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
                 $Hashtable['PlayerId'] = $Hashtable['Player']
                 $Hashtable.Remove('Player')
             }
-            'FplLeague' {}
+            'FplLeague' {
+                $Hashtable['LeagueId'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
+                $Hashtable['LeagueType'] = switch ($Hashtable['LeagueType']) {
+                    'c' {'Public'}
+                    's' {'Global'}
+                    'x' {'Private'}
+                }
+                $Hashtable['Scoring'] = switch ($Hashtable['Scoring']) {
+                    'c' {'Classic'}
+                    'h' {'H2H'}
+                }
+            }
         }
         $Hashtable['PsTypeName'] = $Type
         [pscustomobject]$Hashtable

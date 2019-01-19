@@ -56,6 +56,16 @@ InModuleScope 'PSFPL' {
             $Result.Gameweek | Should -Be 1
             $Result.ClubH + $Result.ClubA | Should -Match 'Liverpool'
         }
+        It 'accepts pipeline input for the Gameweek parameter' {
+            $Gameweek = [PSCustomObject]@{
+                Gameweek = 2
+            }
+            $Result = @($Gameweek | Get-FplFixture)
+            $Result.Count | Should -Be 1
+            foreach ($Gameweek in $Result.Gameweek) {
+                $Gameweek | Should -Be 2
+            }
+        }
         Context 'When the game is updating' {
             BeforeAll {
                 Mock Invoke-RestMethod {'The game is being updated.'}

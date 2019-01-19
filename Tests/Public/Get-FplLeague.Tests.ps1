@@ -43,6 +43,12 @@ InModuleScope 'PSFPL' {
                     $Uri -eq 'https://fantasy.premierleague.com/drf/entry/654321'
                 }
             }
+            It 'accepts pipeline input' {
+                654321 | Get-FplLeague
+                Assert-MockCalled Invoke-RestMethod -Exactly 1 -Scope 'It' -ParameterFilter {
+                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/654321'
+                }
+            }
         }
         Context 'When the game is updating' {
             BeforeAll {

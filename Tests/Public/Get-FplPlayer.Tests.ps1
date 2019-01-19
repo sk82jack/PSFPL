@@ -54,6 +54,10 @@ InModuleScope 'PSFPL' {
                 $Result.WebName | Should -Contain 'Richarlison'
                 $Result.WebName | Should -Not -Contain 'Ederson'
             }
+            It 'accepts pipeline input on the Name parameter' {
+                $Result = 'Ederson' | Get-FplPlayer
+                $Result.WebName | Should -Be 'Ederson'
+            }
             It 'Filters correctly on the Position parameter' {
                 $Result = Get-FplPlayer -Position 'Defender'
                 $Result.WebName | Should -Be 'Alonso'

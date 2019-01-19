@@ -31,7 +31,7 @@ function Get-FplFixture {
     #>
     [CmdletBinding()]
     Param (
-        [Parameter()]
+        [Parameter(ValueFromPipelineByPropertyName)]
         [int]
         $Gameweek,
 
@@ -45,14 +45,16 @@ function Get-FplFixture {
         $Club
     )
 
-    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/fixtures/' -UseBasicParsing
-    if ($Response -match 'The game is being updated.') {
-        Write-Warning 'The game is being updated. Please try again shortly.'
-        return
-    }
-    $Fixtures = ConvertTo-FplObject -InputObject $Response -Type 'FplFixture' | Sort-Object Gameweek, KickOffTime
-    $Fixtures.Where{
-        ($Gameweek -eq 0 -or $_.Gameweek -eq $Gameweek) -and
-        $_.ClubH + $_.ClubA -match $Club
+    process {
+        $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/fixtures/' -UseBasicParsing
+        if ($Response -match 'The game is being updated.') {
+            Write-Warning 'The game is being updated. Please try again shortly.'
+            return
+        }
+        $Fixtures = ConvertTo-FplObject -InputObject $Response -Type 'FplFixture' | Sort-Object Gameweek, KickOffTime
+        $Fixtures.Where{
+            ($Gameweek -eq 0 -or $_.Gameweek -eq $Gameweek) -and
+            $_.ClubH + $_.ClubA -match $Club
+        }
     }
 }
