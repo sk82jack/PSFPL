@@ -104,7 +104,9 @@ function ConvertTo-FplObject {
             'FplTeam' {
                 $Hashtable['Bank'] = $Hashtable['Bank'] / 10
                 $Hashtable['Value'] = $Hashtable['Value'] / 10
-                $Hashtable['FavouriteClub'] = $TeamHash[$Hashtable['FavouriteClub']]
+                if ($Hashtable['FavouriteClub']) {
+                    $Hashtable['FavouriteClub'] = $TeamHash[$Hashtable['FavouriteClub']]
+                }
                 $Hashtable['TeamId'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
                 $Hashtable['PlayerId'] = $Hashtable['Player']
