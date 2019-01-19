@@ -235,14 +235,23 @@ InModuleScope 'PSFPL' {
             BeforeAll {
                 $Object = [PSCustomObject]@{
                     classic = [PSCustomObject]@{
-                        Name = 'Classic League'
+                        Name        = 'Classic League'
+                        league_type = 'c'
+                        _scoring    = 'c'
                     }
                     h2h     = @(
                         [PSCustomObject]@{
                             Name = 'cup'
                         },
                         [PSCustomObject]@{
-                            Name = 'H2H League'
+                            Name        = 'H2H League'
+                            league_type = 's'
+                            _scoring    = 'h'
+                        },
+                        [PSCustomObject]@{
+                            Name        = 'Classic League 2'
+                            league_type = 'x'
+                            _scoring    = 'c'
                         }
                     )
                 }
@@ -253,7 +262,13 @@ InModuleScope 'PSFPL' {
                 $Result[0].PSTypeNames | Should -Contain 'FplLeague'
             }
             It 'adds the classic and h2h leagues together leaving out the cup' {
-                $Result.Name | Should -Be 'Classic League', 'H2H League'
+                $Result.Name | Should -Be 'Classic League', 'H2H League', 'Classic League 2'
+            }
+            It 'converts the LeagueType parameter' {
+                $Result.LeagueType | Should -Be 'Public', 'Global', 'Private'
+            }
+            It 'converts the Scoring parameter' {
+                $Result.Scoring | Should -Be 'Classic', 'H2H', 'Classic'
             }
         }
     }
