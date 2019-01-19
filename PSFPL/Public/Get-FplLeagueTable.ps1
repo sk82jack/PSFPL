@@ -8,6 +8,8 @@ function Get-FplLeagueTable {
         An FPL league Id
     .Parameter Type
         An FPL league type. This can either be 'Classic' or 'HeadToHead'
+    .Parameter League
+        This parameter allows you to pass in an FplLeague object directly which can be retrieved from Get-FplLeague
     .EXAMPLE
         Get-FplLeagueTable -Id 12345 -Type Classic
 
