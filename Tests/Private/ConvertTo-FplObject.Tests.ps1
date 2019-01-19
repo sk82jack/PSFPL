@@ -59,6 +59,10 @@ InModuleScope 'PSFPL' {
             It 'Converts DeadlineTime to a DateTime object' {
                 $Result.DeadlineTime | Should -BeOfType [DateTime]
             }
+            It 'renames the Id property to Gameweek' {
+                $Result.Id | Should -BeNullOrEmpty
+                $Result.Gameweek | Should -BeExactly 1
+            }
         }
         Context 'FplFixture type' {
             BeforeAll {

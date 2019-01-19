@@ -70,6 +70,8 @@ function ConvertTo-FplObject {
             }
             'FplGameweek' {
                 $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
+                $Hashtable['Gameweek'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
             }
             'FplFixture' {
                 $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
