@@ -56,5 +56,13 @@ InModuleScope 'PSFPL' {
             $Result.Gameweek | Should -Be 1
             $Result.ClubH + $Result.ClubA | Should -Match 'Liverpool'
         }
+        Context 'When the game is updating' {
+            BeforeAll {
+                Mock Invoke-RestMethod {'The game is being updated.'}
+            }
+            It 'shows a warning when the game is updating' {
+                Get-FplFixture 3>&1 | Should -Be 'The game is being updated. Please try again shortly.'
+            }
+        }
     }
 }

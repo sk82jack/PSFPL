@@ -44,5 +44,13 @@ InModuleScope 'PSFPL' {
                 }
             }
         }
+        Context 'When the game is updating' {
+            BeforeAll {
+                Mock Invoke-RestMethod {'The game is being updated.'}
+            }
+            It 'shows a warning when the game is updating' {
+                Get-FplLeague 3>&1 | Should -Be 'The game is being updated. Please try again shortly.'
+            }
+        }
     }
 }
