@@ -63,17 +63,21 @@ function ConvertTo-FplObject {
 
         switch ($Type) {
             'FplPlayer' {
+                $Hashtable['PlayerId'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
                 $Hashtable['Position'] = $PositionHash[$Object.element_type]
-                $Hashtable['ClubId'] = $Object.Club
-                $Hashtable['Club'] = $TeamHash[$Object.team]
+                $Hashtable['ClubId'] = $Hashtable['Club']
+                $Hashtable['Club'] = $TeamHash[$Hashtable['Club']]
                 $Hashtable['Price'] = $Object.now_cost / 10
             }
             'FplGameweek' {
-                $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
                 $Hashtable['Gameweek'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
+                $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
             }
             'FplFixture' {
+                $Hashtable['FixtureId'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
                 $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
                 $HashTable['KickoffTime'] = Get-Date $Object.kickoff_time
                 $Hashtable['ClubA'] = $TeamHash[$Object.team_a]
