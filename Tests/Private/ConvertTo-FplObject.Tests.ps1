@@ -8,6 +8,7 @@ InModuleScope 'PSFPL' {
                     element_type = 3
                     team         = 1
                     now_cost     = 58
+                    id           = 4
                 }
                 Mock Get-FplElementType {
                     @{
@@ -32,13 +33,17 @@ InModuleScope 'PSFPL' {
                 $Result.WebName | Should -Be 'Bellerin'
             }
             It 'Converts property names to Pascal Case' {
-                $Result.psobject.properties.Name | Should -Be @('WebName', 'ElementType', 'Club', 'NowCost', 'Position', 'ClubId', 'Price')
+                $Result.psobject.properties.Name | Should -Be @('WebName', 'ElementType', 'Club', 'NowCost', 'PlayerId', 'Position', 'ClubId', 'Price')
             }
             It 'Converts element type to position' {
                 $Result.Position | Should -Be 'Defender'
             }
             It 'Converts team ID to club name' {
                 $Result.Club | Should -Be 'Arsenal'
+            }
+            It 'Converts ID to Player ID' {
+                $Result.Id | Should -BeNullOrEmpty
+                $Result.PlayerId | Should -Be 4
             }
         }
         Context 'FplGameweek type' {
@@ -72,6 +77,7 @@ InModuleScope 'PSFPL' {
                     kickoff_time  = '2018-08-10T19:00:00Z'
                     team_a        = 1
                     team_h        = 2
+                    id            = 3
                     stats         = @(
                         [pscustomobject]@{
                             goals_scored = [pscustomobject]@{
@@ -152,6 +158,10 @@ InModuleScope 'PSFPL' {
                     'Man Utd',
                     'Man Utd'
                 )
+            }
+            It 'Converts ID to Fixture ID' {
+                $Result.Id | Should -BeNullOrEmpty
+                $Result.FixtureId | Should -Be 3
             }
         }
         Context 'FplLeagueTable type' {
@@ -238,20 +248,24 @@ InModuleScope 'PSFPL' {
                         Name        = 'Classic League'
                         league_type = 'c'
                         _scoring    = 'c'
+                        id          = 1
                     }
                     h2h     = @(
                         [PSCustomObject]@{
                             Name = 'cup'
+                            id   = 2
                         },
                         [PSCustomObject]@{
                             Name        = 'H2H League'
                             league_type = 's'
                             _scoring    = 'h'
+                            id          = 3
                         },
                         [PSCustomObject]@{
                             Name        = 'Classic League 2'
                             league_type = 'x'
                             _scoring    = 'c'
+                            id          = 4
                         }
                     )
                 }
@@ -269,6 +283,10 @@ InModuleScope 'PSFPL' {
             }
             It 'converts the Scoring parameter' {
                 $Result.Scoring | Should -Be 'Classic', 'H2H', 'Classic'
+            }
+            It 'Converts ID to League ID' {
+                $Result.foreach{$_.Id | Should -BeNullOrEmpty}
+                $Result.LeagueId | Should -Be 1, 3, 4
             }
         }
     }
