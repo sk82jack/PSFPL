@@ -90,7 +90,7 @@ function Get-FplPlayer {
         }
         if ($DreamTeam) {
             $SortOrder = 'Goalkeeper', 'Defender', 'Midfielder', 'Forward'
-            $Output = $Players.Where{$_.InDreamTeam -eq $true} | Sort-Object {$SortOrder.IndexOf($_.Position)}
+            $Output = $Players.Where{$_.InDreamClub -eq $true} | Sort-Object {$SortOrder.IndexOf($_.Position)}
         }
         $Output
     }

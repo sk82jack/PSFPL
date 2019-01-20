@@ -10,7 +10,7 @@ InModuleScope 'PSFPL' {
                         Position    = 'Goalkeeper'
                         Club        = 'Man City'
                         Price       = 5.8
-                        InDreamTeam = $true
+                        InDreamClub = $true
                         TotalPoints = 62
                     },
                     [pscustomobject]@{
@@ -18,7 +18,7 @@ InModuleScope 'PSFPL' {
                         Position    = 'Defender'
                         Club        = 'Chelsea'
                         Price       = 7.1
-                        InDreamTeam = $true
+                        InDreamClub = $true
                         TotalPoints = 86
                     },
                     [pscustomobject]@{
@@ -26,7 +26,7 @@ InModuleScope 'PSFPL' {
                         Position    = 'Midfielder'
                         Club        = 'Everton'
                         Price       = 7.0
-                        InDreamTeam = $false
+                        InDreamClub = $false
                         TotalPoints = 59
                     },
                     [pscustomobject]@{
@@ -34,7 +34,7 @@ InModuleScope 'PSFPL' {
                         Position    = 'Forward'
                         Club        = 'West Ham'
                         Price       = 7.1
-                        InDreamTeam = $false
+                        InDreamClub = $false
                         TotalPoints = 52
                     }
                 )
