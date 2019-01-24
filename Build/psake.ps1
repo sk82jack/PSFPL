@@ -124,13 +124,15 @@ Task Build -Depends Test {
 
 Task BuildDocs -depends Build {
     $lines
-    Import-Module -Name $env:BHPSModuleManifest -Force
+    "`n`tImporting the module and start building the yaml"
+    Write-Verbose "`tImporting from '$env:BHPSModuleManifest'"
+    Import-Module -Name $env:BHPSModuleManifest -Force -ErrorAction 'Stop'
     $DocFolder = "$env:BHProjectPath\docs"
     $YMLtext = (Get-Content "$env:BHProjectPath\header-mkdocs.yml") -join "`n"
     $YMLtext = "$YMLtext`n  - Change Log: ChangeLog.md`n"
     $YMLText = "$YMLtext  - Functions:`n"
 
-    "`n`tRemoving old documentation"
+    "`tRemoving old documentation"
     $parameters = @{
         Recurse     = $true
         Force       = $true
