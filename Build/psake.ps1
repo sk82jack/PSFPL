@@ -164,7 +164,27 @@ Task BuildDocs -depends Build {
     "`n"
 }
 
-Task Deploy -Depends Build {
+Task TestAfterBuild -Depends BuildDocs {
+    $lines
+    "`n`tSTATUS: Testing with PowerShell $PSVersion"
+
+    # Gather test results
+    $Params = @{
+        Path                   = "$ENV:BHProjectPath\Tests"
+        Show                   = 'Fails'
+        PassThru               = $true
+    }
+    $TestResults = Invoke-Pester @Params
+
+    # Failed tests?
+    # Need to tell psake or it will proceed to the deployment. Danger!
+    if ($TestResults.FailedCount -gt 0) {
+        Write-Error "Failed '$($TestResults.FailedCount)' tests, build failed"
+    }
+    "`n"
+}
+
+Task Deploy -Depends TestAfterBuild {
     $lines
 
     "`tSetting git repository url"
