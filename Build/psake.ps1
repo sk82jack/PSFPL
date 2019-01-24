@@ -160,7 +160,7 @@ Task BuildDocs -depends Build {
 
     [version]$ReleaseVersion = git describe --tags
     Update-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -ReleaseVersion $ReleaseVersion
-    Convertfrom-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
+    Convertfrom-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md" -Format 'Release'
     "`n"
 }
 
