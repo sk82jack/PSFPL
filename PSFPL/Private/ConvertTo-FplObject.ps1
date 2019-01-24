@@ -21,7 +21,7 @@ function ConvertTo-FplObject {
         $InputObject,
 
         [Parameter(Mandatory)]
-        [ValidateSet('FplPlayer', 'FplGameweek', 'FplFixture', 'FplLeagueTable', 'FplTeam', 'FplLeague')]
+        [ValidateSet('FplPlayer', 'FplGameweek', 'FplFixture', 'FplLeagueTable', 'FplTeam', 'FplLeague', 'FplTeamPlayer')]
         [string]
         $Type
     )
@@ -43,6 +43,9 @@ function ConvertTo-FplObject {
         }
         'FplLeague' {
             $InputObject = @($InputObject.classic) + @($InputObject.h2h).where{$_.name -ne 'cup'}
+        }
+        'FplTeamPlayer' {
+            $Players = Get-FplPlayer
         }
     }
 
@@ -128,6 +131,24 @@ function ConvertTo-FplObject {
                     'c' {'Classic'}
                     'h' {'H2H'}
                 }
+            }
+            'FplTeamPlayer' {
+                $Hashtable['PlayerId'] = $Hashtable['Element']
+                $Hashtable.Remove('Element')
+                if ($Hashtable.position -le 11) {
+                    $Hashtable['PlayingStatus'] = 'Starting'
+                }
+                else {
+                    $Hashtable['PlayingStatus'] = 'Substitute'
+                }
+
+                $CurrentPlayer = $Players.Where{$_.PlayerId -eq $Hashtable['PlayerId']}
+                foreach ($Property in (Get-Member -InputObject $CurrentPlayer[0] -MemberType 'NoteProperty').Name) {
+                    $Hashtable[$Property] = $CurrentPlayer.$Property
+                }
+                $Hashtable['Points'] = $CurrentPlayer.GameweekPoints * $Hashtable['Multiplier']
+                $Hashtable.Remove('Multiplier')
+
             }
         }
         $Hashtable['PsTypeName'] = $Type

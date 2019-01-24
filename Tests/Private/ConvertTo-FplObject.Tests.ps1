@@ -289,5 +289,61 @@ InModuleScope 'PSFPL' {
                 $Result.LeagueId | Should -Be 1, 3, 4
             }
         }
+        Context 'FplTeamPlayer' {
+            BeforeAll {
+                Mock Get-FplPlayer {
+                    [PSCustomObject]@{
+                        WebName        = 'Hazard'
+                        PlayerId       = 122
+                        Club           = 'Chelsea'
+                        Position       = 'Midfielder'
+                        GameweekPoints = 8
+                    },
+                    [PSCustomObject]@{
+                        WebName        = 'Alonso'
+                        PlayerId       = 115
+                        Club           = 'Chelsea'
+                        Position       = 'Defender'
+                        GameweekPoints = 2
+                    }
+                }
+
+                $Object = [PSCustomObject]@{
+                    element         = 122
+                    position        = 1
+                    is_captain      = $true
+                    is_vice_captain = $false
+                    multiplier      = 2
+                },
+                [PSCustomObject]@{
+                    element         = 115
+                    position        = 12
+                    is_captain      = $false
+                    is_vice_captain = $false
+                    multiplier      = 1
+                }
+
+                $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplTeamPlayer'
+            }
+            It 'outputs an FPLTeamPlayer object' {
+                $Result[0].PSTypeNames | Should -Contain 'FplTeamPlayer'
+            }
+            It 'renames the Element property to PlayerId' {
+                $Result[0].Element | Should -BeNullOrEmpty
+                $Result.PlayerId | Should -Be 122, 115
+            }
+            It 'sets the PlayingStatus property' {
+                $Result[0].PlayingStatus | Should -Be 'Starting'
+                $Result[1].PlayingStatus | Should -Be 'Substitute'
+            }
+            It 'transfers properties from the FplPlayer object' {
+                $Result.WebName | Should -Be 'Hazard', 'Alonso'
+                $Result.Club | Should -Be 'Chelsea', 'Chelsea'
+                $Result.Position | Should -Be 'Midfielder', 'Defender'
+            }
+            It 'calculates captain points for only the captain' {
+                $Result.Points | Should -Be 16, 2
+            }
+        }
     }
 }
