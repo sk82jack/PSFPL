@@ -4,8 +4,6 @@ trigger:
 - refs/tags/*
 pr:
 - master
-variables:
-  System.Debug: true
 jobs:
 - job: Test_Build_Deploy
   pool:

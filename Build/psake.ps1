@@ -125,7 +125,7 @@ Task Build -Depends Test {
 Task BuildDocs -depends Build {
     $lines
     "`n`tImporting the module and start building the yaml"
-    Write-Verbose "`tImporting from '$env:BHPSModuleManifest'"
+    "`t`tImporting from '$env:BHPSModuleManifest'"
     Import-Module -Name $env:BHPSModuleManifest -Force -ErrorAction 'Stop'
     $DocFolder = "$env:BHProjectPath\docs"
     $YMLtext = (Get-Content "$env:BHProjectPath\header-mkdocs.yml") -join "`n"
