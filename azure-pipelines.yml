@@ -52,6 +52,7 @@ jobs:
       env:
         GITHUB_PAT: $(github.pat)
         PSREPO_APIKEY: $(psrepo.apikey)
+        System.Debug: true
       inputs:
         targetType: 'filePath'
         filePath: .\Build\Start-Build.ps1
