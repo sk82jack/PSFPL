@@ -119,7 +119,6 @@ Task Build -Depends Test {
         Write-Error "Gallery version is higher than the release version. The release version must be increased"
     }
     Update-Metadata -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -Value $ReleaseVersion -ErrorAction stop
-    git add $env:BHPSModuleManifest
     "`n"
 }
 
