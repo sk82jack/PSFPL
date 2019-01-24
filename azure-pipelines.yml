@@ -4,6 +4,8 @@ trigger:
 - refs/tags/*
 pr:
 - master
+variables:
+  System.Debug: true
 jobs:
 - job: Test_Build_Deploy
   pool:
@@ -52,7 +54,6 @@ jobs:
       env:
         GITHUB_PAT: $(github.pat)
         PSREPO_APIKEY: $(psrepo.apikey)
-        System.Debug: true
       inputs:
         targetType: 'filePath'
         filePath: .\Build\Start-Build.ps1
