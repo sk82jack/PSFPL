@@ -119,15 +119,14 @@ Task Build -Depends Test {
         Write-Error "Gallery version is higher than the release version. The release version must be increased"
     }
     Update-Metadata -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -Value $ReleaseVersion -ErrorAction stop
-    git add $env:BHPSModuleManifest
     "`n"
 }
 
 Task BuildDocs -depends Build {
     $lines
     Import-Module -Name $env:BHPSModuleManifest -Force
-    $DocFolder = "$env:BHModulePath\docs"
-    $YMLtext = (Get-Content "$env:BHModulePath\header-mkdocs.yml") -join "`n"
+    $DocFolder = "$env:BHProjectPath\docs"
+    $YMLtext = (Get-Content "$env:BHProjectPath\header-mkdocs.yml") -join "`n"
     $YMLtext = "$YMLtext`n  - Change Log: ChangeLog.md`n"
     $YMLText = "$YMLtext  - Functions:`n"
 
@@ -156,12 +155,37 @@ Task BuildDocs -depends Build {
         $YMLText = "{0}{1}`n" -f $YMLText, $Part
         $Part
     }
-    $YMLtext | Set-Content -Path "$env:BHModulePath\mkdocs.yml"
-    Copy-Item -Path "$env:BHModulePath\README.md" -Destination "$DocFolder\index.md" -Force
+    $YMLtext | Set-Content -Path "$env:BHProjectPath\mkdocs.yml"
+    Copy-Item -Path "$env:BHProjectPath\README.md" -Destination "$DocFolder\index.md" -Force
 
     [version]$ReleaseVersion = git describe --tags
-    Update-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -ReleaseVersion $ReleaseVersion
-    Convertfrom-Changelog -Path "$env:BHModulePath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md"
+    Update-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -ReleaseVersion $ReleaseVersion
+    Convertfrom-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md" -Format 'Release'
+    "`n"
+}
+
+Task TestAfterBuild -Depends BuildDocs {
+    $lines
+    "`n`tSTATUS: Testing with PowerShell $PSVersion"
+
+    # Gather test results
+    $Params = @{
+        Path                   = "$ENV:BHProjectPath\Tests"
+        Show                   = 'Fails'
+        PassThru               = $true
+    }
+    $TestResults = Invoke-Pester @Params
+
+    # Failed tests?
+    # Need to tell psake or it will proceed to the deployment. Danger!
+    if ($TestResults.FailedCount -gt 0) {
+        Write-Error "Failed '$($TestResults.FailedCount)' tests, build failed"
+    }
+    "`n"
+}
+
+Task Deploy -Depends TestAfterBuild {
+    $lines
 
     "`tSetting git repository url"
     if (!$ENV:GITHUB_PAT) {
@@ -169,21 +193,16 @@ Task BuildDocs -depends Build {
     }
     $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 
-    "`tPushing built docs to GitHub"
+    "`tDeploying built docs to GitHub"
     git add "$DocFolder\*"
-    git add "$env:BHModulePath\mkdocs.yml"
-    git add "$env:BHModulePath\CHANGELOG.md"
+    git add "$env:BHProjectPath\mkdocs.yml"
+    git add "$env:BHProjectPath\CHANGELOG.md"
     git commit -m "Bump version to $ReleaseVersion`n***NO_CI***"
     # --porcelain is to stop git sending output to stderr
     git push $GitHubUrl HEAD:master --porcelain
-    "`n"
-}
-
-Task Deploy -Depends Build {
-    $lines
 
     "`n`tTesting for PowerShell Gallery API key"
-    if (!$ENV:GITHUB_PAT) {
+    if (-not $ENV:PSREPO_APIKEY) {
         Write-Error "PowerShell Gallery API key not found"
     }
 
