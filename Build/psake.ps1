@@ -189,6 +189,19 @@ Task TestAfterBuild -Depends BuildDocs {
 Task Deploy -Depends TestAfterBuild {
     $lines
 
+    "`n`tTesting for PowerShell Gallery API key"
+    if (-not $ENV:PSREPO_APIKEY) {
+        Write-Error "PowerShell Gallery API key not found"
+    }
+
+    $Params = @{
+        Path    = "$ENV:BHProjectPath\Build"
+        Force   = $true
+        Recurse = $false # We keep psdeploy artifacts, avoid deploying those : )
+    }
+    "`tInvoking PSDeploy"
+    Invoke-PSDeploy @Verbose @Params
+
     "`tSetting git repository url"
     if (!$ENV:GITHUB_PAT) {
         Write-Error "GitHub personal access token not found"
@@ -202,17 +215,4 @@ Task Deploy -Depends TestAfterBuild {
     git commit -m "Bump version to $ReleaseVersion`n***NO_CI***"
     # --porcelain is to stop git sending output to stderr
     git push $GitHubUrl HEAD:master --porcelain
-
-    "`n`tTesting for PowerShell Gallery API key"
-    if (-not $ENV:PSREPO_APIKEY) {
-        Write-Error "PowerShell Gallery API key not found"
-    }
-
-    $Params = @{
-        Path    = "$ENV:BHProjectPath\Build"
-        Force   = $true
-        Recurse = $false # We keep psdeploy artifacts, avoid deploying those : )
-    }
-    "`tInvoking PSDeploy"
-    Invoke-PSDeploy @Verbose @Params
 }
