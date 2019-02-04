@@ -220,7 +220,7 @@ Task Deploy -Depends TestAfterBuild {
     $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 
     "`tDeploying built docs to GitHub"
-    git add "$DocFolder\*"
+    git add "$env:BHProjectPath\docs\*"
     git add "$env:BHProjectPath\mkdocs.yml"
     git add "$env:BHProjectPath\CHANGELOG.md"
     git commit -m "Bump version to $ReleaseVersion`n***NO_CI***"
