@@ -19,12 +19,12 @@
 
 # Publish to gallery with a few restrictions
 $CommitID = git rev-list -n 1 $env:BHBranchName
-$BranchesContainMaster = (git branch --contains $CommitID).Trim() -match '^\*?master$'
+$Branches = (git branch --contains $CommitID).Trim()
 if (
     $env:BHModulePath -and
     $env:BHBuildSystem -ne 'Unknown' -and
     [version]::TryParse($env:BHBranchName, [ref]$null) -and
-    $BranchesContainMaster
+    $Branches -match '^\*?master$'
 ) {
     Deploy Module {
         By PSGalleryModule {
@@ -40,6 +40,6 @@ else {
     "Skipping deployment: To deploy, ensure that...`n" +
     "`t* You are in a known build system (Current: $ENV:BHBuildSystem)`n" +
     "`t* You are deploying from a tagged release (Current tag/branch: $ENV:BHBranchName)`n" +
-    "`t* You have tagged the master branch (Tagged branch contains the master branch: $BranchesContainMaster)" |
-        Write-Host
+    "`t* You have tagged the master branch (Tagged branches: $($Branches -join ', '))" |
+        Write-Error
 }
