@@ -18,11 +18,13 @@
 # * Set-BuildEnvironment from BuildHelpers module has populated ENV:BHModulePath and related variables
 
 # Publish to gallery with a few restrictions
+$CommitID = git rev-list -n 1 $env:BHBranchName
+$BranchesContainMaster = (git branch --contains $CommitID).Trim() -match '^\*?master$'
 if (
     $env:BHModulePath -and
     $env:BHBuildSystem -ne 'Unknown' -and
-    $env:BHBranchName -eq "master" -and
-    (git describe --tags) -match '^\d\.\d\.\d$'
+    [version]::TryParse($env:BHBranchName, [ref]$null) -and
+    $BranchesContainMaster
 ) {
     Deploy Module {
         By PSGalleryModule {
@@ -37,7 +39,7 @@ if (
 else {
     "Skipping deployment: To deploy, ensure that...`n" +
     "`t* You are in a known build system (Current: $ENV:BHBuildSystem)`n" +
-    "`t* You are committing to the master branch (Current: $ENV:BHBranchName)" +
-    "`t* You are deploying from a tagged release" |
+    "`t* You are deploying from a tagged release (Current tag/branch: $ENV:BHBranchName)`n" +
+    "`t* You have tagged the master branch (Tagged branch contains the master branch: $BranchesContainMaster)" |
         Write-Host
 }
