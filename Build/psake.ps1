@@ -133,13 +133,13 @@ Task BuildDocs -depends Build {
     $YMLText = "$YMLtext  - Functions:`n"
 
     "`tRemoving old documentation"
-    $parameters = @{
+    $Params = @{
         Recurse     = $true
         Force       = $true
         Path        = "$DocFolder\functions"
         ErrorAction = 'SilentlyContinue'
     }
-    $null = Remove-Item @parameters
+    $null = Remove-Item @Params
 
     "`tBuilding documentation"
     if (!(Test-Path $DocFolder)) {
@@ -161,7 +161,14 @@ Task BuildDocs -depends Build {
     Copy-Item -Path "$env:BHProjectPath\README.md" -Destination "$DocFolder\index.md" -Force
 
     [version]$ReleaseVersion = git describe --tags
-    Update-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -ReleaseVersion $ReleaseVersion
+
+    $Params = @{
+        Path = "$env:BHProjectPath\CHANGELOG.md"
+        ReleaseVersion = $ReleaseVersion.ToString()
+        LinkMode = 'Automatic'
+        LinkBase = "https://github.com/sk82jack/$ENV:BHProjectName"
+    }
+    Update-Changelog @Params
     Convertfrom-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md" -Format 'Release'
     "`n"
 }
