@@ -166,7 +166,11 @@ Task BuildDocs -depends Build {
         Path = "$env:BHProjectPath\CHANGELOG.md"
         ReleaseVersion = $ReleaseVersion.ToString()
         LinkMode = 'Automatic'
-        LinkBase = "https://github.com/sk82jack/$ENV:BHProjectName"
+        LinkPattern   = @{
+            FirstRelease  = "https://github.com/sk82jack/$ENV:BHProjectName/tree/v{CUR}"
+            NormalRelease = "https://github.com/sk82jack/$ENV:BHProjectName/compare/v{PREV}..v{CUR}"
+            Unreleased    = "https://github.com/sk82jack/$ENV:BHProjectName/compare/v{CUR}..HEAD"
+        }
     }
     Update-Changelog @Params
     Convertfrom-Changelog -Path "$env:BHProjectPath\CHANGELOG.md" -OutputPath "$DocFolder\ChangeLog.md" -Format 'Release'
