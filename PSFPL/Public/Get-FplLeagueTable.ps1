@@ -19,7 +19,7 @@ function Get-FplLeagueTable {
 
         This will get the league standings for the league that your team is in called 'My League'
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Get-FplLeagueTable
+        https://psfpl.readthedocs.io/en/master/functions/Get-FplLeagueTable
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplLeagueTable.ps1
     #>

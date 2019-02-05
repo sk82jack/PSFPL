@@ -35,7 +35,7 @@ function Get-FplPlayer {
 
         Retrieve the current dream team
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Get-FplPlayer
+        https://psfpl.readthedocs.io/en/master/functions/Get-FplPlayer
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplPlayer.ps1
     #>

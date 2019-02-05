@@ -22,7 +22,7 @@ function Get-FplTeamPlayer {
 
         This will get the player information for the team with ID 12345 from gameweek 12
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Get-FplTeamPlayer
+        https://psfpl.readthedocs.io/en/master/functions/Get-FplTeamPlayer
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplTeamPlayer.ps1
     #>

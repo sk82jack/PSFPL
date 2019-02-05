@@ -86,7 +86,7 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## RELATED LINKS
 
-[https://psfpl.readthedocs.io/en/latest/functions/Get-FplFixture](https://psfpl.readthedocs.io/en/latest/functions/Get-FplFixture)
+[https://psfpl.readthedocs.io/en/master/functions/Get-FplFixture](https://psfpl.readthedocs.io/en/master/functions/Get-FplFixture)
 
 [https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplFixture.ps1](https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplFixture.ps1)
 

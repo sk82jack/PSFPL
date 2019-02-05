@@ -25,7 +25,7 @@ function Get-FplFixture {
 
         This will get the Chelsea FC fixture in gameweek 2
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Get-FplFixture
+        https://psfpl.readthedocs.io/en/master/functions/Get-FplFixture
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplFixture.ps1
     #>

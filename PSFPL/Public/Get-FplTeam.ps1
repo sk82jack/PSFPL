@@ -16,7 +16,7 @@ function Get-FplTeam {
 
         Retrieves information about the team with the ID 12345
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Get-FplTeam
+        https://psfpl.readthedocs.io/en/master/functions/Get-FplTeam
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplTeam.ps1
     #>
