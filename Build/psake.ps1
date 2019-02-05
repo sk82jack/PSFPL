@@ -115,7 +115,7 @@ Task Build -Depends Test {
     "`tUpdating the module manifest with the new version number"
     [version]$ReleaseVersion = git describe --tags
     $GalleryVersion = Get-NextNugetPackageVersion -Name $env:BHProjectName -ErrorAction Stop
-    if ($ReleaseVersion -le $GalleryVersion) {
+    if ($ReleaseVersion -lt $GalleryVersion) {
         Write-Error "Gallery version is higher than the release version. The release version must be increased"
     }
     Update-Metadata -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -Value $ReleaseVersion -ErrorAction stop
