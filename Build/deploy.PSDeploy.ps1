@@ -19,12 +19,19 @@
 
 # Publish to gallery with a few restrictions
 $CommitID = git rev-list -n 1 $env:BHBranchName
-$Branches = (git branch --contains $CommitID).Trim()
+$Refs = git show-ref | Foreach-Object {
+    $Commit, $Ref = $_.split()
+    [PSCustomObject]@{
+        Commit = $Commit
+        Ref    = $Ref
+    }
+}
+$Branches = $Refs.Where{$_.Commit -eq $CommitID}.Ref
 if (
     $env:BHModulePath -and
     $env:BHBuildSystem -ne 'Unknown' -and
     [version]::TryParse($env:BHBranchName, [ref]$null) -and
-    $Branches -match '^\*?master$'
+    $Branches -eq 'refs/remotes/origin/master'
 ) {
     Deploy Module {
         By PSGalleryModule {
