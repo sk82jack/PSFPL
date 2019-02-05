@@ -1,0 +1,24 @@
+site_name: PSFPL
+repo_url: https://github.com/sk82jack/PSFPL
+site_author: Jack Denton
+edit_uri: edit/master/docs/
+copyright: "AutoDocumentsExample is licensed under the <a href="https://github.com/sk82jack/PSFPL/raw/master/LICENSE">MIT license</a>"
+theme: readthedocs
+pages:
+  - Home: index.md
+  - Change Log: ChangeLog.md
+  - Functions:
+    - Connect-Fpl: functions/Connect-Fpl.md
+    - ConvertTo-FplObject: functions/ConvertTo-FplObject.md
+    - Get-FplClubId: functions/Get-FplClubId.md
+    - Get-FplElementId: functions/Get-FplElementId.md
+    - Get-FplElementType: functions/Get-FplElementType.md
+    - Get-FplFixture: functions/Get-FplFixture.md
+    - Get-FplGameweek: functions/Get-FplGameweek.md
+    - Get-FplLeague: functions/Get-FplLeague.md
+    - Get-FplLeagueTable: functions/Get-FplLeagueTable.md
+    - Get-FplPlayer: functions/Get-FplPlayer.md
+    - Get-FplTeam: functions/Get-FplTeam.md
+    - Get-FplTeamPlayer: functions/Get-FplTeamPlayer.md
+    - Get-FplUserTeam: functions/Get-FplUserTeam.md
+
