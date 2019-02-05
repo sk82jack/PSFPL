@@ -80,7 +80,7 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## RELATED LINKS
 
-[https://psfpl.readthedocs.io/en/latest/functions/Get-FplTeamPlayer](https://psfpl.readthedocs.io/en/latest/functions/Get-FplTeamPlayer)
+[https://psfpl.readthedocs.io/en/master/functions/Get-FplTeamPlayer](https://psfpl.readthedocs.io/en/master/functions/Get-FplTeamPlayer)
 
 [https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplTeamPlayer.ps1](https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplTeamPlayer.ps1)
 

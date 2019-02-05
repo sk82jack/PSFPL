@@ -14,7 +14,7 @@ function Connect-Fpl {
     .EXAMPLE
         Connect-FPL -Credential myname@email.com -Force
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Connect-Fpl
+        https://psfpl.readthedocs.io/en/master/functions/Connect-Fpl
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Connect-FPL.ps1
     #>

@@ -69,7 +69,7 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## RELATED LINKS
 
-[https://psfpl.readthedocs.io/en/latest/functions/Connect-Fpl](https://psfpl.readthedocs.io/en/latest/functions/Connect-Fpl)
+[https://psfpl.readthedocs.io/en/master/functions/Connect-Fpl](https://psfpl.readthedocs.io/en/master/functions/Connect-Fpl)
 
 [https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Connect-FPL.ps1](https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Connect-FPL.ps1)
 

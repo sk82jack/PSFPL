@@ -92,7 +92,7 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## RELATED LINKS
 
-[https://psfpl.readthedocs.io/en/latest/functions/Get-FplGameweek](https://psfpl.readthedocs.io/en/latest/functions/Get-FplGameweek)
+[https://psfpl.readthedocs.io/en/master/functions/Get-FplGameweek](https://psfpl.readthedocs.io/en/master/functions/Get-FplGameweek)
 
 [https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplGameweek.ps1](https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplGameweek.ps1)
 

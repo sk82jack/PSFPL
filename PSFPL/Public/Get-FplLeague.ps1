@@ -17,7 +17,7 @@ function Get-FplLeague {
 
         This will list the leagues that the team with the team ID of 12345 is in.
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Get-FplLeague
+        https://psfpl.readthedocs.io/en/master/functions/Get-FplLeague
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplLeague.ps1
     #>

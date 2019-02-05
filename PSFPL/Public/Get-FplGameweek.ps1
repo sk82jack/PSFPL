@@ -25,7 +25,7 @@ function Get-FplGameweek {
 
         This will list only the current gameweek
     .LINK
-        https://psfpl.readthedocs.io/en/latest/functions/Get-FplGameweek
+        https://psfpl.readthedocs.io/en/master/functions/Get-FplGameweek
     .LINK
         https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Get-FplGameweek.ps1
     #>
