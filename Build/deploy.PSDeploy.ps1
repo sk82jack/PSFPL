@@ -36,7 +36,7 @@ if (
     Deploy Module {
         By PSGalleryModule {
             FromSource $ENV:BHModulePath
-            To PHERepo
+            To PSGallery
             WithOptions @{
                 ApiKey = $ENV:PSREPO_APIKEY
             }
