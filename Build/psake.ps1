@@ -37,7 +37,7 @@ Task SetBuildVersion -Depends Init {
 
     "`tSetting build version"
     $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
-    "|Build Version|`n|---|`n|$ENV:BUILD_NAME|" | Out-File -FilePath $BuildVersionPath -Force
+    "|Build Version|`r`n|---|`r`n|$ENV:BUILD_NAME|" | Out-File -FilePath $BuildVersionPath -Force
 
     "`tPushing build version to GitHub"
     git add $BuildVersionPath
@@ -128,9 +128,9 @@ Task BuildDocs -depends Build {
     "`t`tImporting from '$env:BHPSModuleManifest'"
     Import-Module -Name $env:BHPSModuleManifest -Global -Force -ErrorAction 'Stop'
     $DocFolder = "$env:BHProjectPath\docs"
-    $YMLtext = (Get-Content "$env:BHProjectPath\header-mkdocs.yml") -join "`n"
-    $YMLtext = "$YMLtext`n  - Change Log: ChangeLog.md`n"
-    $YMLText = "$YMLtext  - Functions:`n"
+    $YMLtext = (Get-Content "$env:BHProjectPath\header-mkdocs.yml") -join "`r`n"
+    $YMLtext = "$YMLtext`r`n  - Change Log: ChangeLog.md`r`n"
+    $YMLText = "$YMLtext  - Functions:`r`n"
 
     "`tRemoving old documentation"
     $Params = @{
@@ -154,7 +154,7 @@ Task BuildDocs -depends Build {
     New-MarkdownHelp @Params | foreach-object {
         $Function = $_.Name -replace '\.md', ''
         $Part = "    - {0}: functions/{1}" -f $Function, $_.Name
-        $YMLText = "{0}{1}`n" -f $YMLText, $Part
+        $YMLText = "{0}{1}`r`n" -f $YMLText, $Part
         $Part
     }
     $YMLtext | Set-Content -Path "$env:BHProjectPath\mkdocs.yml"
