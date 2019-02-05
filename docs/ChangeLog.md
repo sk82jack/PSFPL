@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2019-02-05
+### Fixed
+- Fixed the online documentation links within the functions to valid URLs
+
 ## [1.0.0] - 2019-02-05
 ### Added
 - Get-FplTeamPlayer - a function to get the player scoring information of a given team on a given gameweek
@@ -15,4 +19,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Get-FplPlayer - a function to retrieve player data
 - Connect-FPL - a function to log into the FPL API to retrieve data about your team
 
+[1.0.1]: https://github.com/sk82jack/PSFPL/compare/v1.0.0..v1.0.1
 [1.0.0]: https://github.com/sk82jack/PSFPL/tree/v1.0.0

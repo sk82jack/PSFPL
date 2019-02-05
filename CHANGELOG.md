@@ -14,9 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
-- Fixed the online documentation links within the functions to valid URLs
 
 ### Security
+
+## [1.0.1] - 2019-02-05
+### Fixed
+- Fixed the online documentation links within the functions to valid URLs
 
 ## [1.0.0] - 2019-02-05
 ### Added
@@ -29,5 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Get-FplPlayer - a function to retrieve player data
 - Connect-FPL - a function to log into the FPL API to retrieve data about your team
 
-[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v1.0.0..HEAD
+[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v1.0.1..HEAD
+[1.0.1]: https://github.com/sk82jack/PSFPL/compare/v1.0.0..v1.0.1
 [1.0.0]: https://github.com/sk82jack/PSFPL/tree/v1.0.0
