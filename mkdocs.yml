@@ -2,7 +2,7 @@ site_name: PSFPL
 repo_url: https://github.com/sk82jack/PSFPL
 site_author: Jack Denton
 edit_uri: edit/master/docs/
-copyright: "AutoDocumentsExample is licensed under the <a href="https://github.com/sk82jack/PSFPL/raw/master/LICENSE">MIT license</a>"
+copyright: "AutoDocumentsExample is licensed under the <a href='https://github.com/sk82jack/PSFPL/raw/master/LICENSE'>MIT license</a>"
 theme: readthedocs
 pages:
   - Home: index.md
