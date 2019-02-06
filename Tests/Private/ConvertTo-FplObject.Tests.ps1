@@ -26,22 +26,22 @@ InModuleScope 'PSFPL' {
                 }
                 $Result = ConvertTo-FplObject -InputObject $Object -Type FplPlayer
             }
-            It 'Outputs an FplPlayer object' {
+            It 'outputs an FplPlayer object' {
                 $Result.PSTypeNames | Should -Contain 'FplPlayer'
             }
-            It 'Converts diacritic characters' {
+            It 'converts diacritic characters' {
                 $Result.WebName | Should -Be 'Bellerin'
             }
-            It 'Converts property names to Pascal Case' {
+            It 'converts property names to Pascal Case' {
                 $Result.psobject.properties.Name | Should -Be @('WebName', 'ElementType', 'Club', 'NowCost', 'PlayerId', 'Position', 'ClubId', 'Price')
             }
-            It 'Converts element type to position' {
+            It 'converts element type to position' {
                 $Result.Position | Should -Be 'Defender'
             }
-            It 'Converts team ID to club name' {
+            It 'converts team ID to club name' {
                 $Result.Club | Should -Be 'Arsenal'
             }
-            It 'Converts ID to Player ID' {
+            It 'converts ID to Player ID' {
                 $Result.Id | Should -BeNullOrEmpty
                 $Result.PlayerId | Should -Be 4
             }
@@ -55,13 +55,13 @@ InModuleScope 'PSFPL' {
                 }
                 $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplGameweek'
             }
-            It 'Outputs an FplGameweek object' {
+            It 'outputs an FplGameweek object' {
                 $Result.PSTypeNames | Should -Contain 'FplGameweek'
             }
-            It 'Converts "Entry" in a property name to "Team"' {
+            It 'converts "Entry" in a property name to "Team"' {
                 $Result.psobject.properties.name | Should -Contain 'AverageTeamScore'
             }
-            It 'Converts DeadlineTime to a DateTime object' {
+            It 'converts DeadlineTime to a DateTime object' {
                 $Result.DeadlineTime | Should -BeOfType [DateTime]
             }
             It 'renames the Id property to Gameweek' {
@@ -78,6 +78,37 @@ InModuleScope 'PSFPL' {
                     team_a        = 1
                     team_h        = 2
                     id            = 3
+                    stats         = @(
+                        [pscustomobject]@{
+                            goals_scored = [pscustomobject]@{
+                                a = @(
+                                    [pscustomobject]@{
+                                        value   = 1
+                                        element = 234
+                                    }
+                                )
+                                h = @(
+                                    [pscustomobject]@{
+                                        value   = 1
+                                        element = 286
+                                    },
+                                    [pscustomobject]@{
+                                        value   = 1
+                                        element = 302
+                                    }
+                                )
+                            }
+                        }
+                    )
+                },
+                [PSCustomObject]@{
+                    event         = 2
+                    deadline_time = $null
+                    kickoff_time  = $null
+                    gameweek      = $null
+                    team_a        = 3
+                    team_h        = 4
+                    id            = 5
                     stats         = @(
                         [pscustomobject]@{
                             goals_scored = [pscustomobject]@{
@@ -117,23 +148,23 @@ InModuleScope 'PSFPL' {
                     }
                 }
 
-                $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplFixture'
+                $Result = ConvertTo-FplObject -InputObject $Object[0] -Type 'FplFixture'
             }
-            It 'Changes "Event" to "Gameweek" in property names' {
+            It 'changes "Event" to "Gameweek" in property names' {
                 $Result.psobject.properties.Name | Should -Contain 'Gameweek'
                 $Result.psobject.properties.Name | Should -Not -Contain 'Event'
             }
-            It 'Converts DeadlineTime to a DateTime object' {
+            It 'converts DeadlineTime to a DateTime object' {
                 $Result.DeadlineTime | Should -BeOfType [DateTime]
             }
-            It 'Converts KickoffTime to a DateTime object' {
+            It 'converts KickoffTime to a DateTime object' {
                 $Result.KickoffTime | Should -BeOfType [DateTime]
             }
-            It 'Converts team ID to name' {
+            It 'converts team ID to name' {
                 $Result.Stats[0].ClubName | Should -Be 'Leicester'
                 $Result.Stats[1].ClubName | Should -Be 'Man Utd'
             }
-            It 'Flattens the nested stats property' {
+            It 'flattens the nested stats property' {
                 $Result.Stats[0].psobject.Properties.Name | Should -Be  @(
                     'PlayerId',
                     'PlayerName',
@@ -142,26 +173,32 @@ InModuleScope 'PSFPL' {
                     'ClubName'
                 )
             }
-            It 'Converts stats player ID to name' {
+            It 'converts stats player ID to name' {
                 $Result.Stats.PlayerName | Should -Be @(
                     'Vardy',
                     'Shaw',
                     'Pogba'
                 )
             }
-            It 'Removes underscores from stat types' {
+            It 'removes underscores from stat types' {
                 $Result.Stats.StatType | Should -Not -Match '_'
             }
-            It 'Converts stats club ID to name' {
+            It 'converts stats club ID to name' {
                 $Result.Stats.ClubName | Should -Be @(
                     'Leicester',
                     'Man Utd',
                     'Man Utd'
                 )
             }
-            It 'Converts ID to Fixture ID' {
+            It 'converts ID to Fixture ID' {
                 $Result.Id | Should -BeNullOrEmpty
                 $Result.FixtureId | Should -Be 3
+            }
+            It 'handles null values for deadline, kickoff and gameweek' {
+                $Result = ConvertTo-FplObject -InputObject $Object[1] -Type 'FplFixture'
+                $Result.Gameweek, $Result.DeadlineTime, $Result.KickoffTime | Foreach-Object {
+                    $_ | Should -Be 'tbc'
+                }
             }
         }
         Context 'FplLeagueTable type' {
@@ -284,7 +321,7 @@ InModuleScope 'PSFPL' {
             It 'converts the Scoring parameter' {
                 $Result.Scoring | Should -Be 'Classic', 'H2H', 'Classic'
             }
-            It 'Converts ID to League ID' {
+            It 'converts ID to League ID' {
                 $Result.foreach{$_.Id | Should -BeNullOrEmpty}
                 $Result.LeagueId | Should -Be 1, 3, 4
             }
