@@ -38,7 +38,7 @@ jobs:
       condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       env:
         BUILD_NAME: $(Build.BuildNumber)
-        GITHUB_PAT: $(github.pat)
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       inputs:
         targetType: 'filePath'
         filePath: .\Build\Start-Build.ps1
@@ -50,7 +50,7 @@ jobs:
       displayName: 'Build and deploy'
       condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
       env:
-        GITHUB_PAT: $(github.pat)
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
         PSREPO_APIKEY: $(psrepo.apikey)
       inputs:
         targetType: 'filePath'

@@ -12,8 +12,8 @@ Properties {
         $Verbose = @{Verbose = $True}
     }
 
-    git config user.email 'sk82jack@hotmail.com'
-    git config user.name 'sk82jack'
+    #git config user.email 'sk82jack@hotmail.com'
+    #git config user.name 'sk82jack'
 }
 
 Task Default -Depends Test
@@ -30,10 +30,10 @@ Task SetBuildVersion -Depends Init {
     $lines
 
     "`n`tSetting git repository url"
-    if (!$ENV:GITHUB_PAT) {
+    if (!$Env:System_AccessToken) {
         Write-Error "GitHub personal access token not found"
     }
-    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
+    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $Env:System_AccessToken
 
     "`tSetting build version"
     $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
@@ -214,10 +214,10 @@ Task Deploy -Depends TestAfterBuild {
     Invoke-PSDeploy @Verbose @Params
 
     "`tSetting git repository url"
-    if (!$ENV:GITHUB_PAT) {
+    if (!$Env:System_AccessToken) {
         Write-Error "GitHub personal access token not found"
     }
-    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
+    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $Env:System_AccessToken
 
     "`tDeploying built docs to GitHub"
     git add "$env:BHProjectPath\docs\*"
