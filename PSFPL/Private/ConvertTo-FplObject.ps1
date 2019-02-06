@@ -81,8 +81,21 @@ function ConvertTo-FplObject {
             'FplFixture' {
                 $Hashtable['FixtureId'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
-                $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
-                $HashTable['KickoffTime'] = Get-Date $Object.kickoff_time
+                $Hashtable['DeadlineTime'] = try {
+                    Get-Date $Object.deadline_time
+                }
+                catch {
+                    'tbc'
+                }
+                $HashTable['KickoffTime'] = try {
+                    Get-Date $Object.kickoff_time
+                }
+                catch {
+                    'tbc'
+                }
+                if (-not $Hashtable['Gameweek']) {
+                    $Hashtable['Gameweek'] = 'tbc'
+                }
                 $Hashtable['ClubA'] = $TeamHash[$Object.team_a]
                 $Hashtable['ClubH'] = $TeamHash[$Object.team_h]
                 $Hashtable['Stats'] = foreach ($Stat in $Hashtable['Stats']) {
