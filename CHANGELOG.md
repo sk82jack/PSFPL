@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- Fixed a bug with rearranged fixtures that hadn't been rescheduled yet
+- Fixed error handling for non-existent leagues
 
 ### Security
 
