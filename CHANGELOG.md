@@ -14,10 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
-- Fixed a bug with rearranged fixtures that hadn't been rescheduled yet
-- Fixed error handling for non-existent leagues
 
 ### Security
+
+## [1.0.2] - 2019-02-07
+### Fixed
+- Fixed a bug with rearranged fixtures that hadn't been rescheduled yet
+- Fixed error handling for non-existent leagues
 
 ## [1.0.1] - 2019-02-05
 ### Fixed
@@ -34,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Get-FplPlayer - a function to retrieve player data
 - Connect-FPL - a function to log into the FPL API to retrieve data about your team
 
-[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v1.0.1..HEAD
+[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v1.0.2..HEAD
+[1.0.2]: https://github.com/sk82jack/PSFPL/compare/v1.0.1..v1.0.2
 [1.0.1]: https://github.com/sk82jack/PSFPL/compare/v1.0.0..v1.0.1
 [1.0.0]: https://github.com/sk82jack/PSFPL/tree/v1.0.0
