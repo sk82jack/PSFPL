@@ -52,12 +52,18 @@ function Get-FplLeagueTable {
     process {
         if ($PSCmdlet.ParameterSetName -eq 'PipelineInput') {
             $Type = $League.Scoring
-            $Id = $League.LeagueId
+            $LeagueId = $League.LeagueId
         }
         $Results = do {
             $Page += 1
-            $Url = 'https://fantasy.premierleague.com/drf/leagues-{0}-standings/{1}?phase=1&le-page=1&ls-page={2}' -f $Type.ToLower(), $Id, $Page
-            $Response = Invoke-RestMethod -Uri $Url -UseBasicParsing
+            $Url = 'https://fantasy.premierleague.com/drf/leagues-{0}-standings/{1}?phase=1&le-page=1&ls-page={2}' -f $Type.ToLower(), $LeagueId, $Page
+            try {
+                $Response = Invoke-RestMethod -Uri $Url -UseBasicParsing
+            }
+            catch {
+                Write-Warning "A $Type league with ID $LeagueId does not exist"
+                return
+            }
             if ($Response -match 'The game is being updated.') {
                 Write-Warning 'The game is being updated. Please try again shortly.'
                 return
