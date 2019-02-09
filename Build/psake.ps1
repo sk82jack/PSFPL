@@ -165,6 +165,11 @@ Task BuildDocs -depends Build {
 
     [version]$ReleaseVersion = git describe --tags
 
+    $ChangeLogData = Get-ChangeLogData
+    if (-not ($ChangeLogData.Unreleased.Data.psobject.properties.value -ne '')) {
+        Write-Error 'Cannot perform a deploy without updating the changelog'
+    }
+
     $Params = @{
         Path = "$env:BHProjectPath\CHANGELOG.md"
         ReleaseVersion = $ReleaseVersion.ToString()
