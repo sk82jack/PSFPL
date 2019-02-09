@@ -91,6 +91,9 @@ Task Build -Depends Test {
         [void]$Stringbuilder.AppendLine("Write-Verbose 'Importing from [$env:BHModulePath\$Folder]'" )
         if (Test-Path "$env:BHModulePath\$Folder") {
             $Files = Get-ChildItem "$env:BHModulePath\$Folder\*.ps1"
+            if ($Folder -eq 'Public') {
+                $PublicFunctions = $Files.BaseName
+            }
             foreach ($File in $Files) {
                 $Name = $File.Name
                 "`tImporting [.$Name]"
@@ -107,7 +110,7 @@ Task Build -Depends Test {
 
     # Load the module, read the exported functions & aliases, update the psd1 FunctionsToExport & AliasesToExport
     "`tSetting module functions"
-    Set-ModuleFunctions
+    Set-ModuleFunctions -FunctionsToExport $PublicFunctions
     "`tSetting module aliases"
     Set-ModuleAliases
 
