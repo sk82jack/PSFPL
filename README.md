@@ -44,7 +44,7 @@ For a full list of available commands please check the documentation at https://
 
 This function will allow you to pull information on players. You can run the function as is to get information on all players in the game:
 
-![Get-FplPlayer](docs/images/Get-FplPlayer.gif)
+![Get-FplPlayer](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Get-FplPlayer.gif)
 
 There are also parameters to allow you to filter your search based on name, club, position, price and dream team.
 
@@ -52,7 +52,7 @@ There are also parameters to allow you to filter your search based on name, club
 
 This function will allow you to pull information on fixtures. You can run the function as is to get information on all fixtures:
 
-![Get-FplFixture](docs/images/Get-FplFixture.gif)
+![Get-FplFixture](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Get-FplFixture.gif)
 
 There are also parameters to allow you to filter your search based on gameweek and club.
 
@@ -60,7 +60,7 @@ There are also parameters to allow you to filter your search based on gameweek a
 
 This function will allow you to pull information on gameweeks. You can run the function as is to get information on all gameweeks:
 
-![Get-FplGameweek](docs/images/Get-FplGameweek.gif)
+![Get-FplGameweek](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Get-FplGameweek.gif)
 
 There are also parameters to allow you to filter your search based on the gameweek number and the current gameweek.
 
@@ -68,7 +68,7 @@ There are also parameters to allow you to filter your search based on the gamewe
 
 There are a few functions which require authentication in order to pull information about your own team. You can run this function to log in with your credentials:
 
-![Connect-Fpl](docs/images/Connect-Fpl.gif)
+![Connect-Fpl](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Connect-Fpl.gif)
 
 If you want to change the logged in account then you can run the function again with the `Force` parameter.
 
@@ -76,7 +76,7 @@ If you want to change the logged in account then you can run the function again 
 
 This function will allow you to pull league information for a specific team. If you have authenticated with the API then it will show your own leagues:
 
-![Get-FplLeague](docs/images/Get-FplLeague.gif)
+![Get-FplLeague](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Get-FplLeague.gif)
 
 If you haven't authenticated already and don't specify a team ID with the `TeamID` parameter then it will ask for your credentials to log in and pull your leagues.
 
@@ -84,7 +84,7 @@ If you haven't authenticated already and don't specify a team ID with the `TeamI
 
 This function will allow you to pull your league tables. This can take a few minutes for large public leagues. The easiest way is to filter the results of `Get-FplLeague` and pipe it straight into this function:
 
-![Get-FplLeagueTable](docs/images/Get-FplLeagueTable.gif)
+![Get-FplLeagueTable](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Get-FplLeagueTable.gif)
 
 There are `LeagueID` and `Type` parameters available to use if you don't want to pipe the league in from `Get-FplLeague`.
 
@@ -92,7 +92,7 @@ There are `LeagueID` and `Type` parameters available to use if you don't want to
 
 This function will allow you to pull team information for a specific team. If you have authenticated with the API then it will show your own team:
 
-![Get-FplTeam](docs/images/Get-FplTeam.gif)
+![Get-FplTeam](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Get-FplTeam.gif)
 
 If you haven't authenticated already and don't specify a team ID with the `TeamID` parameter then it will ask for your credentials to log in and pull your leagues.
 
@@ -100,19 +100,19 @@ If you haven't authenticated already and don't specify a team ID with the `TeamI
 
 This function will allow you to pull the lineup for a specific team in a specified gameweek. If you have authenticated with the API then it will show your own lineup from the current gameweek:
 
-![Get-FplTeamPlayer](docs/images/Get-FplTeamPlayer.gif)
+![Get-FplTeamPlayer](https://raw.githubusercontent.com/sk82jack/PSFPL/master/docs/images/Get-FplTeamPlayer.gif)
 
 If you haven't authenticated already and don't specify a team ID with the `TeamID` parameter then it will ask for your credentials to log in and pull your lineup.
 
 ## Contributing to PSFPL
 
-Interested in contributing? Read how you can [Contribute](Contributing.md) to PSFPL
+Interested in contributing? Read how you can [Contribute](https://github.com/sk82jack/PSFPL/blob/master/Contributing.md) to PSFPL
 
 ## Release History
 
-A detailed release history is contained in the [Change Log](CHANGELOG.md).
+A detailed release history is contained in the [Change Log](https://github.com/sk82jack/PSFPL/blob/master/CHANGELOG.md).
 
 ## License
 
-PSFPL is provided under the [MIT license](LICENSE).
+PSFPL is provided under the [MIT license](https://github.com/sk82jack/PSFPL/blob/master/LICENSE).
 
