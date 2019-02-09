@@ -9,10 +9,6 @@ pages:
   - Change Log: ChangeLog.md
   - Functions:
     - Connect-Fpl: functions/Connect-Fpl.md
-    - ConvertTo-FplObject: functions/ConvertTo-FplObject.md
-    - Get-FplClubId: functions/Get-FplClubId.md
-    - Get-FplElementId: functions/Get-FplElementId.md
-    - Get-FplElementType: functions/Get-FplElementType.md
     - Get-FplFixture: functions/Get-FplFixture.md
     - Get-FplGameweek: functions/Get-FplGameweek.md
     - Get-FplLeague: functions/Get-FplLeague.md
@@ -20,5 +16,4 @@ pages:
     - Get-FplPlayer: functions/Get-FplPlayer.md
     - Get-FplTeam: functions/Get-FplTeam.md
     - Get-FplTeamPlayer: functions/Get-FplTeamPlayer.md
-    - Get-FplUserTeam: functions/Get-FplUserTeam.md
 
