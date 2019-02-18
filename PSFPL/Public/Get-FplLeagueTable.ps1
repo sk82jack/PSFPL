@@ -56,7 +56,7 @@ function Get-FplLeagueTable {
         }
         $Results = do {
             $Page += 1
-            $Url = 'https://fantasy.premierleague.com/drf/leagues-{0}-standings/{1}?phase=1&le-page=1&ls-page={2}' -f $Type.ToLower(), $LeagueId, $Page
+            $Url = 'https://fantasy.premierleague.com/drf/leagues-{0}-standings/{1}?phase=1&le-page=1&ls-page={2}/' -f $Type.ToLower(), $LeagueId, $Page
             try {
                 $Response = Invoke-RestMethod -Uri $Url -UseBasicParsing
             }

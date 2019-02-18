@@ -11,7 +11,7 @@ function Get-FplElementType {
     #>
     [CmdletBinding()]
     param ()
-    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/element-types' -UseBasicParsing
+    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/element-types/' -UseBasicParsing
     $ElementHash = @{}
     foreach ($Element in $Response) {
         $ElementHash[$Element.id] = $Element.singular_name
