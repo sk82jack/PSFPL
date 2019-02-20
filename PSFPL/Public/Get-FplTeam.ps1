@@ -36,7 +36,7 @@ function Get-FplTeam {
             ConvertTo-FplObject -InputObject $Response.entry -Type 'FplTeam'
         }
         else {
-            if (!$Script:FplSession) {
+            if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['FplSession'])) {
                 Write-Warning 'No existing connection found'
                 $Credential = Get-Credential -Message 'Please enter your FPL login details'
                 Connect-Fpl -Credential $Credential
