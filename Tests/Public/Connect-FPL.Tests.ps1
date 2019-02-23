@@ -27,14 +27,22 @@ InModuleScope 'PSFPL' {
             }
 
             Mock Invoke-WebRequest -ParameterFilter {$Body -and $Body['login'] -eq 'GoodUserName'} {
+                $String = 'csrftoken=gLQjahvAQrHPKMAaCru1MZiSSkwRbbNN; expires=Wed, 25-Dec-2019 14:21:20 GMT; ' +
+                    'Max-Age=31449600; Path=/sessionid=".eJyrVkpPzE2NT85PSVWyUirISSvIUdJRik8sLcmILy1OLYpPSkzOTs1L' +
+                    'AUsmVqYW6UEFivUCwHwnqDyKpkyg-mhDHXNTM0szI_PYWgBVsyN-:1gcA3k:qSFMS32dMMJ6mC29t3zXnrCTzgA"; ' +
+                    'httponly; Path=/affiliate=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/' +
+                    'one-click-join=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'
                 [PSCustomObject]@{
                     Headers = @{
-                        'Set-Cookie' = @(
-                            'csrftoken=gLQjahvAQrHPKMAaCru1MZiSSkwRbbNN; expires=Wed, 25-Dec-2019 14:21:20 GMT; Max-Age=31449600; Path=/'
-                            'sessionid=".eJyrVkpPzE2NT85PSVWyUirISSvIUdJRik8sLcmILy1OLYpPSkzOTs1LAUsmVqYW6UEFivUCwHwnqDyKpkyg-mhDHXNTM0szI_PYWgBVsyN-:1gcA3k:qSFMS32dMMJ6mC29t3zXnrCTzgA"; httponly; Path=/'
-                            'affiliate=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'
-                            'one-click-join=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'
-                        )
+                        'Set-Cookie' = $String
+                    }
+                }
+            }
+
+            Mock Invoke-RestMethod {
+                [PSCustomObject]@{
+                    entry = [PSCustomObject]@{
+                        id = 12345
                     }
                 }
             }
@@ -46,33 +54,33 @@ InModuleScope 'PSFPL' {
         }
         Context 'Execution' {
             It 'throws a terminating error if bad credentials are given' {
-                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
                 {Connect-FPL -Credential $BadCreds} | Should -Throw
             }
             It "doesn't throw a terminating error if good credentials are given" {
-                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
                 {Connect-FPL -Credential $GoodCreds} | Should -Not -Throw
             }
             It "doesn't connect if an existing connection exists" {
-                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
                 Connect-FPL -Credential $GoodCreds
                 $Response = Connect-FPL -Credential $GoodCreds 3>&1
                 $Response.Message | Should -Be 'A connection already exists. Use the Force parameter to connect.'
             }
             It "connects if an existing connection exists but we use the force parameter" {
-                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
                 Connect-FPL -Credential $GoodCreds
                 $Response = Connect-FPL -Credential $GoodCreds -Force 3>&1
                 $Response.Message | Should -BeNullOrEmpty
             }
         }
         Context 'Output' {
-            It 'adds the FPL session is available within the module scope' {
-                Remove-Variable -Name 'FplSession' -Scope 'Script' -ErrorAction 'SilentlyContinue'
+            It 'adds the FPL session data to the module scope' {
                 Connect-FPL -Credential $GoodCreds
-                $FplSession | Should -Not -BeNullOrEmpty
-                $FplSession | Should -BeOfType 'Microsoft.PowerShell.Commands.WebRequestSession'
+                $FplSessionData | Should -Not -BeNullOrEmpty
+                $FplSessionData['FplSession'] | Should -BeOfType 'Microsoft.PowerShell.Commands.WebRequestSession'
+                $FplSessionData['CsrfToken'] | Should -Be 'gLQjahvAQrHPKMAaCru1MZiSSkwRbbNN'
+                $FplSessionData['TeamID'] | Should -Be 12345
             }
+        }
+        AfterEach {
+            Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction SilentlyContinue
         }
     }
 }

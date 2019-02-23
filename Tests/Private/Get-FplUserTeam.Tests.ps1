@@ -2,6 +2,9 @@ Import-Module $ENV:BHPSModuleManifest -Force
 InModuleScope 'PSFPL' {
     Describe 'Get-FplUserTeam' {
         BeforeAll {
+            $Script:FplSessionData = @{
+                FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
+            }
             Mock Invoke-RestMethod {
                 [PSCustomObject]@{
                     entry = 123456
@@ -15,6 +18,9 @@ InModuleScope 'PSFPL' {
         }
         It 'converts the API response to an FplTeam object' {
             Assert-MockCalled ConvertTo-FplObject -ParameterFilter {$Type -eq 'FplTeam'}
+        }
+        AfterAll {
+            Remove-Variable -Name 'FplSessionData' -Scope 'Script'
         }
     }
 }

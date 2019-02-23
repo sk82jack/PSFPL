@@ -3,14 +3,14 @@ InModuleScope 'PSFPL' {
     Describe 'Get-FplLeagueTable' {
         Context 'Normal circumstances' {
             BeforeAll {
-                Mock Invoke-RestMethod -ParameterFilter {$Uri -match 'page=1$'} {
+                Mock Invoke-RestMethod -ParameterFilter {$Uri -match 'page=1/$'} {
                     [PSCustomObject]@{
                         standings = [PSCustomObject]@{
                             has_next = $true
                         }
                     }
                 }
-                Mock Invoke-RestMethod -ParameterFilter {$Uri -match 'page=2$'} {
+                Mock Invoke-RestMethod -ParameterFilter {$Uri -match 'page=2/$'} {
                     [PSCustomObject]@{
                         standings = [PSCustomObject]@{
                             has_next = $false
@@ -25,7 +25,7 @@ InModuleScope 'PSFPL' {
             }
             It 'processes parameter input' {
                 $Result = Get-FplLeagueTable -LeagueId 12345 -Type 'Classic'
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/leagues-classic-standings/12345?phase=1&le-page=1&ls-page=1'}
+                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/leagues-classic-standings/12345?phase=1&le-page=1&ls-page=1/'}
             }
             It 'processes pipeline input for an FplLeague object' {
                 $League = [PSCustomObject]@{
@@ -35,12 +35,12 @@ InModuleScope 'PSFPL' {
                 }
 
                 $League | Get-FplLeagueTable
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/leagues-h2h-standings/56789?phase=1&le-page=1&ls-page=1'}
+                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/leagues-h2h-standings/56789?phase=1&le-page=1&ls-page=1/'}
             }
         }
         Context 'When the game is updating' {
             BeforeAll {
-                Mock Invoke-RestMethod -ParameterFilter {$Uri -match 'page=1$'} {'The game is being updated.'}
+                Mock Invoke-RestMethod -ParameterFilter {$Uri -match 'page=1/$'} {'The game is being updated.'}
             }
             It 'shows a warning when the game is updating' {
                 Get-FplLeagueTable -LeagueId 12345 -Type 'Classic' 3>&1 | Should -Be 'The game is being updated. Please try again shortly.'

@@ -1,7 +1,7 @@
 function Set-FplLineupCaptain {
     [CmdletBinding()]
     param (
-        [Parameter()]
+        [Parameter(Mandatory)]
         [PSObject[]]
         $Lineup,
 

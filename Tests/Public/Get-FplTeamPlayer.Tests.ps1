@@ -21,8 +21,16 @@ InModuleScope 'PSFPL' {
                     $Password = ConvertTo-SecureString 'password' -AsPlainText -Force
                     [Management.Automation.PSCredential]::new('UserName', $Password)
                 }
-                Mock Connect-Fpl {}
-                Mock Get-FplUserTeam {'12345'}
+                Mock Connect-Fpl {
+                    $Script:FplSessionData = @{
+                        FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
+                        CsrfToken  = 'csrftoken'
+                        TeamID     = 12345
+                    }
+                }
+            }
+            AfterEach {
+                Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
             It 'returns a warning' {
                 $Result = Get-FplTeamPlayer -Gameweek 14 3>&1
@@ -35,15 +43,20 @@ InModuleScope 'PSFPL' {
         }
         Context 'No TeamId whilst logged in' {
             BeforeAll {
-                Mock Get-FplUserTeam {}
-                $Script:FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
+                $Script:FplSessionData = @{
+                    FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
+                    CsrfToken  = 'csrftoken'
+                    TeamID     = 12345
+                }
             }
             AfterAll {
-                Remove-Variable -Name 'FplSession' -Scope 'Script'
+                Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
             It 'calls Get-FplUserTeam when no parameter is given' {
                 $Results = Get-FplTeamPlayer -Gameweek 13
-                Assert-MockCalled Get-FplUserTeam -Scope 'It'
+                Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
+                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/12345/event/13/picks'
+                }
             }
         }
         Context 'No Gameweek parameter supplied' {
