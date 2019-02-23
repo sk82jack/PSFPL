@@ -21,7 +21,7 @@ function Get-FplLineup {
         Connect-Fpl -Credential $Credential
     }
 
-    $TeamId = (Get-FplUserTeam).TeamId
+    $TeamId = $Script:FplSessionData['TeamID']
 
     $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/my-team/$TeamId/" -WebSession $FplSessionData['FplSession'] -UseBasicParsing
 

@@ -50,8 +50,11 @@ function Connect-Fpl {
         Throw 'Invalid credentials'
     }
 
+    $TeamInfo = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/transfers' -UseBasicParsing -WebSession $FplSession
+
     $Script:FplSessionData = @{
         FplSession = $FplSession
         CsrfToken  = $Response.Headers.'Set-Cookie' -replace '.*csrftoken=(.*?);.*', '$1'
+        TeamID     = $TeamInfo.entry.id
     }
 }

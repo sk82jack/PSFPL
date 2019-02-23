@@ -45,7 +45,7 @@ function Get-FplTeamPlayer {
                 Connect-Fpl -Credential $Credential
             }
 
-            $TeamId = (Get-FplUserTeam).TeamId
+            $TeamId = $Script:FplSessionData['TeamID']
         }
 
         if ($Gameweek -eq 0) {
