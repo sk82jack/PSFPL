@@ -11,6 +11,6 @@ function Get-FplUserTeam {
     #>
     [CmdletBinding()]
     param ()
-    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/transfers' -UseDefaultCredentials -WebSession $Script:FplSession
+    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/transfers' -UseBasicParsing -WebSession $Script:FplSessionData['FplSession']
     ConvertTo-FplObject -InputObject $Response.entry -Type 'FplTeam'
 }

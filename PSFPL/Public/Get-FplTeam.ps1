@@ -28,7 +28,7 @@ function Get-FplTeam {
     )
     process {
         if ($TeamId -gt 0) {
-            $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/entry/$TeamId" -UseDefaultCredentials
+            $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/entry/$TeamId/" -UseDefaultCredentials
             if ($Response -match 'The game is being updated.') {
                 Write-Warning 'The game is being updated. Please try again shortly.'
                 return
@@ -36,7 +36,7 @@ function Get-FplTeam {
             ConvertTo-FplObject -InputObject $Response.entry -Type 'FplTeam'
         }
         else {
-            if (!$Script:FplSession) {
+            if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['FplSession'])) {
                 Write-Warning 'No existing connection found'
                 $Credential = Get-Credential -Message 'Please enter your FPL login details'
                 Connect-Fpl -Credential $Credential

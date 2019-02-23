@@ -39,13 +39,13 @@ function Get-FplTeamPlayer {
     )
     process {
         if ($TeamId -eq 0) {
-            if (!$Script:FplSession) {
+            if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['FplSession'])) {
                 Write-Warning 'No existing connection found'
                 $Credential = Get-Credential -Message 'Please enter your FPL login details'
                 Connect-Fpl -Credential $Credential
             }
 
-            $TeamId = (Get-FplUserTeam).TeamId
+            $TeamId = $Script:FplSessionData['TeamID']
         }
 
         if ($Gameweek -eq 0) {

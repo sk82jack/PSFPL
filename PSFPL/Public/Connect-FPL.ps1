@@ -29,17 +29,17 @@ function Connect-Fpl {
         $Force
     )
 
-    if ($Script:FplSession -and -not $Force) {
+    if ($Script:FplSessionData -and $Script:FplSessionData['FplSession'] -and (-not $Force)) {
         Write-Warning "A connection already exists. Use the Force parameter to connect."
         return
     }
 
     $Uri = 'https://users.premierleague.com/accounts/login/'
     $LoginResponse = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -UseBasicParsing
-    $CsrfToken = $LoginResponse.InputFields.Where{$_.name -eq 'csrfmiddlewaretoken'}.value
+    $CsrfMiddlewareToken = $LoginResponse.InputFields.Where{$_.name -eq 'csrfmiddlewaretoken'}.value
 
     $Response = Invoke-WebRequest -Uri $Uri -WebSession $FplSession -Method 'Post' -UseBasicParsing -Body @{
-        'csrfmiddlewaretoken' = $CsrfToken
+        'csrfmiddlewaretoken' = $CsrfMiddlewareToken
         'login'               = $Credential.UserName
         'password'            = $Credential.GetNetworkCredential().Password
         'app'                 = 'plfpl-web'
@@ -50,5 +50,11 @@ function Connect-Fpl {
         Throw 'Invalid credentials'
     }
 
-    $Script:FplSession = $FplSession
+    $TeamInfo = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/transfers' -UseBasicParsing -WebSession $FplSession
+
+    $Script:FplSessionData = @{
+        FplSession = $FplSession
+        CsrfToken  = $Response.Headers.'Set-Cookie' -replace '.*csrftoken=(.*?);.*', '$1'
+        TeamID     = $TeamInfo.entry.id
+    }
 }
