@@ -5,11 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
-## [1.0.3] - 2019-02-09
 ### Added
+- Get-FplLineup - a function to retreive the users lineup for the upcoming gameweek
+- Set-FplLineup - a function to make changes to the users lineup for the upcoming gameweek
 
 ### Changed
+- Improve performance by caching a users team ID
 
 ### Deprecated
 
@@ -18,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [1.0.3] - 2019-02-09
 
 ## [1.0.2] - 2019-02-07
 ### Fixed
