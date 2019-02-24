@@ -183,6 +183,7 @@ function ConvertTo-FplObject {
                 foreach ($Property in 'WebName', 'Position', 'Club') {
                     $Hashtable[$Property] = $CurrentPlayer.$Property
                 }
+                $Hashtable['SellingPrice'] = $Hashtable['SellingPrice'] / 10
             }
         }
         $Hashtable['PsTypeName'] = $Type
