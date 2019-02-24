@@ -40,7 +40,7 @@ function Get-FplLeague {
             $TeamId = $Script:FplSessionData['TeamID']
         }
 
-        $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/entry/$TeamId" -UseDefaultCredentials
+        $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/entry/$TeamId" -UseBasicParsing
         if ($Response -match 'The game is being updated.') {
             Write-Warning 'The game is being updated. Please try again shortly.'
             return
