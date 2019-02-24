@@ -28,10 +28,10 @@ InModuleScope 'PSFPL' {
 
             Mock Invoke-WebRequest -ParameterFilter {$Body -and $Body['login'] -eq 'GoodUserName'} {
                 $String = 'csrftoken=gLQjahvAQrHPKMAaCru1MZiSSkwRbbNN; expires=Wed, 25-Dec-2019 14:21:20 GMT; ' +
-                    'Max-Age=31449600; Path=/sessionid=".eJyrVkpPzE2NT85PSVWyUirISSvIUdJRik8sLcmILy1OLYpPSkzOTs1L' +
-                    'AUsmVqYW6UEFivUCwHwnqDyKpkyg-mhDHXNTM0szI_PYWgBVsyN-:1gcA3k:qSFMS32dMMJ6mC29t3zXnrCTzgA"; ' +
-                    'httponly; Path=/affiliate=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/' +
-                    'one-click-join=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'
+                'Max-Age=31449600; Path=/sessionid=".eJyrVkpPzE2NT85PSVWyUirISSvIUdJRik8sLcmILy1OLYpPSkzOTs1L' +
+                'AUsmVqYW6UEFivUCwHwnqDyKpkyg-mhDHXNTM0szI_PYWgBVsyN-:1gcA3k:qSFMS32dMMJ6mC29t3zXnrCTzgA"; ' +
+                'httponly; Path=/affiliate=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/' +
+                'one-click-join=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'
                 [PSCustomObject]@{
                     Headers = @{
                         'Set-Cookie' = $String
@@ -41,6 +41,7 @@ InModuleScope 'PSFPL' {
 
             Mock Invoke-RestMethod {
                 [PSCustomObject]@{
+                    ce    = 27
                     entry = [PSCustomObject]@{
                         id = 12345
                     }
@@ -77,6 +78,7 @@ InModuleScope 'PSFPL' {
                 $FplSessionData['FplSession'] | Should -BeOfType 'Microsoft.PowerShell.Commands.WebRequestSession'
                 $FplSessionData['CsrfToken'] | Should -Be 'gLQjahvAQrHPKMAaCru1MZiSSkwRbbNN'
                 $FplSessionData['TeamID'] | Should -Be 12345
+                $FplSessionData['CurrentGW'] | Should -Be 27
             }
         }
         AfterEach {

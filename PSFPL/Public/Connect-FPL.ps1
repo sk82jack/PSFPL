@@ -56,5 +56,6 @@ function Connect-Fpl {
         FplSession = $FplSession
         CsrfToken  = $Response.Headers.'Set-Cookie' -replace '.*csrftoken=(.*?);.*', '$1'
         TeamID     = $TeamInfo.entry.id
+        CurrentGW  = $TeamInfo.ce
     }
 }

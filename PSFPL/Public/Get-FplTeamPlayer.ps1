@@ -49,7 +49,12 @@ function Get-FplTeamPlayer {
         }
 
         if ($Gameweek -eq 0) {
-            $Gameweek = (Get-FplGameweek -Current).Gameweek
+            if ($Script:FplSessionData) {
+                $Gameweek = $Script:FplSessionData['CurrentGW']
+            }
+            else {
+                Get-FplGameweek -Current
+            }
         }
 
         $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/entry/$TeamId/event/$Gameweek/picks"
