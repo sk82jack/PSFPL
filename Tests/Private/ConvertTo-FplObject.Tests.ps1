@@ -382,5 +382,67 @@ InModuleScope 'PSFPL' {
                 $Result.Points | Should -Be 16, 2
             }
         }
+        Context 'FplLineup' {
+            BeforeAll {
+                Mock Get-FplPlayer {
+                    [PSCustomObject]@{
+                        WebName        = 'Hazard'
+                        PlayerId       = 122
+                        Club           = 'Chelsea'
+                        Position       = 'Midfielder'
+                        GameweekPoints = 8
+                    },
+                    [PSCustomObject]@{
+                        WebName        = 'Alonso'
+                        PlayerId       = 115
+                        Club           = 'Chelsea'
+                        Position       = 'Defender'
+                        GameweekPoints = 2
+                    }
+                }
+
+                $Object = [PSCustomObject]@{
+                    element         = 122
+                    position        = 1
+                    is_captain      = $true
+                    is_vice_captain = $false
+                    multiplier      = 2
+                    selling_price   = 111
+                },
+                [PSCustomObject]@{
+                    element         = 115
+                    position        = 12
+                    is_captain      = $false
+                    is_vice_captain = $false
+                    multiplier      = 1
+                    selling_price   = 67
+                }
+
+                $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplLineup'
+            }
+            It 'outputs an FPLLineup object' {
+                $Result[0].PSTypeNames | Should -Contain 'FplLineup'
+            }
+            It 'renames the Element property to PlayerId' {
+                $Result[0].Element | Should -BeNullOrEmpty
+                $Result.PlayerId | Should -Be 122, 115
+            }
+            It 'renames the Position property to PositionNumber' {
+                $Result[0].Element | Should -BeNullOrEmpty
+                $Result.PositionNumber | Should -Be 1, 12
+            }
+            It 'sets the PlayingStatus property' {
+                $Result[0].PlayingStatus | Should -Be 'Starting'
+                $Result[1].PlayingStatus | Should -Be 'Substitute'
+            }
+            It 'transfers properties from the FplPlayer object' {
+                $Result.WebName | Should -Be 'Hazard', 'Alonso'
+                $Result.Club | Should -Be 'Chelsea', 'Chelsea'
+                $Result.Position | Should -Be 'Midfielder', 'Defender'
+            }
+            It 'calculates and sets selling price' {
+                $Result.SellingPrice | Should -Be 11.1, 6.7
+            }
+        }
     }
 }
