@@ -61,7 +61,12 @@ function ConvertTo-FplObject {
         $Object.psobject.properties | ForEach-Object {
             $Name = $TextInfo.ToTitleCase($_.Name) -replace '_' -replace 'Team', 'Club' -replace 'Entry', 'Team' -replace 'Event', 'Gameweek'
             $Value = if ($_.Value -is [string]) {
-                $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
+                if ($PSVersionTable.PSVersion.Major -lt 6) {
+                    $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
+                }
+                else {
+                    $DiacriticName = $_.value
+                }
                 [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($DiacriticName)).trim()
             }
             else {
