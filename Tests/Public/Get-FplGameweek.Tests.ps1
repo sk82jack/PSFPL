@@ -6,12 +6,12 @@ InModuleScope 'PSFPL' {
             Mock ConvertTo-FplObject {
                 @(
                     [pscustomobject]@{
-                        Id        = 1
+                        Gameweek  = 1
                         Name      = 'Gameweek 1'
                         IsCurrent = $false
                     },
                     [pscustomobject]@{
-                        Id        = 2
+                        Gameweek  = 2
                         Name      = 'Gameweek 2'
                         IsCurrent = $true
                     }

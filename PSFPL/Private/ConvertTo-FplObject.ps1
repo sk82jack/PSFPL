@@ -70,124 +70,125 @@ function ConvertTo-FplObject {
             $Hashtable[$Name] = $Value
         }
 
-    switch ($Type) {
-        'FplPlayer' {
-            $Hashtable['PlayerId'] = $Hashtable['Id']
-            $Hashtable.Remove('Id')
-            $Hashtable['Name'] = $Hashtable['WebName']
-            $Hashtable['Position'] = $PositionHash[$Object.element_type]
-            $Hashtable['ClubId'] = $Hashtable['Club']
-            $Hashtable['Club'] = $TeamHash[$Hashtable['Club']]
-            $Hashtable['Price'] = $Object.now_cost / 10
-        }
-        'FplGameweek' {
-            $Hashtable['Gameweek'] = $Hashtable['Id']
-            $Hashtable.Remove('Id')
-            $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
-        }
-        'FplFixture' {
-            $Hashtable['FixtureId'] = $Hashtable['Id']
-            $Hashtable.Remove('Id')
-            $Hashtable['DeadlineTime'] = try {
-                Get-Date $Object.deadline_time
+        switch ($Type) {
+            'FplPlayer' {
+                $Hashtable['PlayerId'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
+                $Hashtable['Name'] = $Hashtable['WebName']
+                $Hashtable['Position'] = $PositionHash[$Object.element_type]
+                $Hashtable['ClubId'] = $Hashtable['Club']
+                $Hashtable['Club'] = $TeamHash[$Hashtable['Club']]
+                $Hashtable['Price'] = $Object.now_cost / 10
             }
-            catch {
-                'tbc'
+            'FplGameweek' {
+                $Hashtable['GameweekId'] = $Hashtable['Id']
+                $Hashtable['Gameweek'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
+                $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
             }
-            $HashTable['KickoffTime'] = try {
-                Get-Date $Object.kickoff_time
-            }
-            catch {
-                'tbc'
-            }
-            if (-not $Hashtable['Gameweek']) {
-                $Hashtable['Gameweek'] = 'tbc'
-            }
-            $Hashtable['ClubA'] = $TeamHash[$Object.team_a]
-            $Hashtable['ClubH'] = $TeamHash[$Object.team_h]
-            $Hashtable['Stats'] = foreach ($Stat in $Hashtable['Stats']) {
-                $StatType = $TextInfo.ToTitleCase($Stat.PSObject.Properties.Name)
-                foreach ($Letter in 'a', 'h') {
-                    $Club = 'Club{0}' -f $Letter.ToUpper()
-                    foreach ($Item in $Stat.$StatType.$Letter) {
-                        [pscustomobject]@{
-                            'PlayerId'   = $Item.element
-                            'PlayerName' = $PlayerHash[$Item.element]
-                            'StatType'   = $StatType -replace '_'
-                            'StatValue'  = $Item.value
-                            'ClubName'   = $Hashtable[$club]
+            'FplFixture' {
+                $Hashtable['FixtureId'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
+                $Hashtable['DeadlineTime'] = try {
+                    Get-Date $Object.deadline_time
+                }
+                catch {
+                    'tbc'
+                }
+                $HashTable['KickoffTime'] = try {
+                    Get-Date $Object.kickoff_time
+                }
+                catch {
+                    'tbc'
+                }
+                if (-not $Hashtable['Gameweek']) {
+                    $Hashtable['Gameweek'] = 'tbc'
+                }
+                $Hashtable['ClubA'] = $TeamHash[$Object.team_a]
+                $Hashtable['ClubH'] = $TeamHash[$Object.team_h]
+                $Hashtable['Stats'] = foreach ($Stat in $Hashtable['Stats']) {
+                    $StatType = $TextInfo.ToTitleCase($Stat.PSObject.Properties.Name)
+                    foreach ($Letter in 'a', 'h') {
+                        $Club = 'Club{0}' -f $Letter.ToUpper()
+                        foreach ($Item in $Stat.$StatType.$Letter) {
+                            [pscustomobject]@{
+                                'PlayerId'   = $Item.element
+                                'PlayerName' = $PlayerHash[$Item.element]
+                                'StatType'   = $StatType -replace '_'
+                                'StatValue'  = $Item.value
+                                'ClubName'   = $Hashtable[$club]
+                            }
                         }
                     }
                 }
             }
-        }
-        'FplLeagueTable' {
-            $Hashtable['LeagueName'] = $LeagueName
-            $Hashtable['LeagueId'] = $Hashtable['League']
-            $Hashtable.Remove('League')
-            $Hashtable['TeamId'] = $Hashtable['Team']
-            $Hashtable.Remove('Team')
-        }
-        'FplTeam' {
-            $Hashtable['Bank'] = $Hashtable['Bank'] / 10
-            $Hashtable['Value'] = $Hashtable['Value'] / 10
-            if ($Hashtable['FavouriteClub']) {
-                $Hashtable['FavouriteClub'] = $TeamHash[$Hashtable['FavouriteClub']]
+            'FplLeagueTable' {
+                $Hashtable['LeagueName'] = $LeagueName
+                $Hashtable['LeagueId'] = $Hashtable['League']
+                $Hashtable.Remove('League')
+                $Hashtable['TeamId'] = $Hashtable['Team']
+                $Hashtable.Remove('Team')
             }
-            $Hashtable['TeamId'] = $Hashtable['Id']
-            $Hashtable.Remove('Id')
-            $Hashtable['PlayerId'] = $Hashtable['Player']
-            $Hashtable.Remove('Player')
-        }
-        'FplLeague' {
-            $Hashtable['LeagueId'] = $Hashtable['Id']
-            $Hashtable.Remove('Id')
-            $Hashtable['LeagueType'] = switch ($Hashtable['LeagueType']) {
-                'c' {'Public'}
-                's' {'Global'}
-                'x' {'Private'}
+            'FplTeam' {
+                $Hashtable['Bank'] = $Hashtable['Bank'] / 10
+                $Hashtable['Value'] = $Hashtable['Value'] / 10
+                if ($Hashtable['FavouriteClub']) {
+                    $Hashtable['FavouriteClub'] = $TeamHash[$Hashtable['FavouriteClub']]
+                }
+                $Hashtable['TeamId'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
+                $Hashtable['PlayerId'] = $Hashtable['Player']
+                $Hashtable.Remove('Player')
             }
-            $Hashtable['Scoring'] = switch ($Hashtable['Scoring']) {
-                'c' {'Classic'}
-                'h' {'H2H'}
+            'FplLeague' {
+                $Hashtable['LeagueId'] = $Hashtable['Id']
+                $Hashtable.Remove('Id')
+                $Hashtable['LeagueType'] = switch ($Hashtable['LeagueType']) {
+                    'c' {'Public'}
+                    's' {'Global'}
+                    'x' {'Private'}
+                }
+                $Hashtable['Scoring'] = switch ($Hashtable['Scoring']) {
+                    'c' {'Classic'}
+                    'h' {'H2H'}
+                }
             }
-        }
-        'FplTeamPlayer' {
-            $Hashtable['PlayerId'] = $Hashtable['Element']
-            $Hashtable.Remove('Element')
-            if ($Hashtable.position -le 11) {
-                $Hashtable['PlayingStatus'] = 'Starting'
-            }
-            else {
-                $Hashtable['PlayingStatus'] = 'Substitute'
-            }
+            'FplTeamPlayer' {
+                $Hashtable['PlayerId'] = $Hashtable['Element']
+                $Hashtable.Remove('Element')
+                if ($Hashtable.position -le 11) {
+                    $Hashtable['PlayingStatus'] = 'Starting'
+                }
+                else {
+                    $Hashtable['PlayingStatus'] = 'Substitute'
+                }
 
-            $CurrentPlayer = $Players.Where{$_.PlayerId -eq $Hashtable['PlayerId']}
-            foreach ($Property in (Get-Member -InputObject $CurrentPlayer[0] -MemberType 'NoteProperty').Name) {
-                $Hashtable[$Property] = $CurrentPlayer.$Property
-            }
-            $Hashtable['Points'] = $CurrentPlayer.GameweekPoints * $Hashtable['Multiplier']
-            $Hashtable.Remove('Multiplier')
+                $CurrentPlayer = $Players.Where{$_.PlayerId -eq $Hashtable['PlayerId']}
+                foreach ($Property in (Get-Member -InputObject $CurrentPlayer[0] -MemberType 'NoteProperty').Name) {
+                    $Hashtable[$Property] = $CurrentPlayer.$Property
+                }
+                $Hashtable['Points'] = $CurrentPlayer.GameweekPoints * $Hashtable['Multiplier']
+                $Hashtable.Remove('Multiplier')
 
+            }
+            'FplLineup' {
+                $Hashtable['PlayerId'] = $Hashtable['Element']
+                $Hashtable.Remove('Element')
+                $Hashtable['PositionNumber'] = $Hashtable['Position']
+                if ($Hashtable.position -le 11) {
+                    $Hashtable['PlayingStatus'] = 'Starting'
+                }
+                else {
+                    $Hashtable['PlayingStatus'] = 'Substitute'
+                }
+                $CurrentPlayer = $Players.Where{$_.PlayerId -eq $Hashtable['PlayerId']}
+                foreach ($Property in 'Name', 'Position', 'Club') {
+                    $Hashtable[$Property] = $CurrentPlayer.$Property
+                }
+                $Hashtable['SellingPrice'] = $Hashtable['SellingPrice'] / 10
+            }
         }
-        'FplLineup' {
-            $Hashtable['PlayerId'] = $Hashtable['Element']
-            $Hashtable.Remove('Element')
-            $Hashtable['PositionNumber'] = $Hashtable['Position']
-            if ($Hashtable.position -le 11) {
-                $Hashtable['PlayingStatus'] = 'Starting'
-            }
-            else {
-                $Hashtable['PlayingStatus'] = 'Substitute'
-            }
-            $CurrentPlayer = $Players.Where{$_.PlayerId -eq $Hashtable['PlayerId']}
-            foreach ($Property in 'Name', 'Position', 'Club') {
-                $Hashtable[$Property] = $CurrentPlayer.$Property
-            }
-            $Hashtable['SellingPrice'] = $Hashtable['SellingPrice'] / 10
-        }
+        $Hashtable['PsTypeName'] = $Type
+        [pscustomobject]$Hashtable
     }
-    $Hashtable['PsTypeName'] = $Type
-    [pscustomobject]$Hashtable
-}
 }
