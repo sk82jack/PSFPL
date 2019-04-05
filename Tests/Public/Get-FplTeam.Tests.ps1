@@ -12,11 +12,11 @@ InModuleScope 'PSFPL' {
             }
             It 'passes the TeamId onto Invoke-RestMethod' {
                 $Results = Get-FplTeam -TeamId 123456
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456/'} -Scope 'It'
+                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456'} -Scope 'It'
             }
             It 'accepts pipeline input' {
                 $Results = 123456 | Get-FplTeam
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456/'} -Scope 'It'
+                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456'} -Scope 'It'
             }
         }
         Context 'No TeamID whilst not logged in' {

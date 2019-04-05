@@ -30,10 +30,10 @@ InModuleScope 'PSFPL' {
                 $Result.PSTypeNames | Should -Contain 'FplPlayer'
             }
             It 'converts diacritic characters' {
-                $Result.WebName | Should -Be 'Bellerin'
+                $Result.Name | Should -Be 'Bellerin'
             }
             It 'converts property names to Pascal Case' {
-                $Result.psobject.properties.Name | Should -Be @('WebName', 'ElementType', 'Club', 'NowCost', 'PlayerId', 'Position', 'ClubId', 'Price')
+                $Result.psobject.properties.Name | Should -Be @('WebName', 'ElementType', 'Club', 'NowCost', 'PlayerId', 'Name', 'Position', 'ClubId', 'Price')
             }
             It 'converts element type to position' {
                 $Result.Position | Should -Be 'Defender'
@@ -196,7 +196,7 @@ InModuleScope 'PSFPL' {
             }
             It 'handles null values for deadline, kickoff and gameweek' {
                 $Result = ConvertTo-FplObject -InputObject $Object[1] -Type 'FplFixture'
-                $Result.Gameweek, $Result.DeadlineTime, $Result.KickoffTime | Foreach-Object {
+                $Result.Gameweek, $Result.DeadlineTime, $Result.KickoffTime | ForEach-Object {
                     $_ | Should -Be 'tbc'
                 }
             }
@@ -233,14 +233,14 @@ InModuleScope 'PSFPL' {
                 $Results = ConvertTo-FplObject -InputObject $Object -Type 'FplLeagueTable'
             }
             It 'adds the LeagueName property' {
-                $Results | Foreach-Object {$_.LeagueName | Should -Be 'MyCustomLeague'}
+                $Results | ForEach-Object {$_.LeagueName | Should -Be 'MyCustomLeague'}
             }
             It 'renames the League property to LeagueId' {
-                $Results | Foreach-Object {$_.League | Should -BeNullOrEmpty}
+                $Results | ForEach-Object {$_.League | Should -BeNullOrEmpty}
                 $Results.LeagueId | Should -Contain 12345
             }
             It 'renames the Team property to TeamId' {
-                $Results | Foreach-Object {$_.Team | Should -BeNullOrEmpty}
+                $Results | ForEach-Object {$_.Team | Should -BeNullOrEmpty}
                 $Results.TeamId | Should -Be 54321, 65432
             }
         }
@@ -330,14 +330,14 @@ InModuleScope 'PSFPL' {
             BeforeAll {
                 Mock Get-FplPlayer {
                     [PSCustomObject]@{
-                        WebName        = 'Hazard'
+                        Name           = 'Hazard'
                         PlayerId       = 122
                         Club           = 'Chelsea'
                         Position       = 'Midfielder'
                         GameweekPoints = 8
                     },
                     [PSCustomObject]@{
-                        WebName        = 'Alonso'
+                        Name           = 'Alonso'
                         PlayerId       = 115
                         Club           = 'Chelsea'
                         Position       = 'Defender'
@@ -374,7 +374,7 @@ InModuleScope 'PSFPL' {
                 $Result[1].PlayingStatus | Should -Be 'Substitute'
             }
             It 'transfers properties from the FplPlayer object' {
-                $Result.WebName | Should -Be 'Hazard', 'Alonso'
+                $Result.Name | Should -Be 'Hazard', 'Alonso'
                 $Result.Club | Should -Be 'Chelsea', 'Chelsea'
                 $Result.Position | Should -Be 'Midfielder', 'Defender'
             }
@@ -386,14 +386,14 @@ InModuleScope 'PSFPL' {
             BeforeAll {
                 Mock Get-FplPlayer {
                     [PSCustomObject]@{
-                        WebName        = 'Hazard'
+                        Name           = 'Hazard'
                         PlayerId       = 122
                         Club           = 'Chelsea'
                         Position       = 'Midfielder'
                         GameweekPoints = 8
                     },
                     [PSCustomObject]@{
-                        WebName        = 'Alonso'
+                        Name           = 'Alonso'
                         PlayerId       = 115
                         Club           = 'Chelsea'
                         Position       = 'Defender'
@@ -436,7 +436,7 @@ InModuleScope 'PSFPL' {
                 $Result[1].PlayingStatus | Should -Be 'Substitute'
             }
             It 'transfers properties from the FplPlayer object' {
-                $Result.WebName | Should -Be 'Hazard', 'Alonso'
+                $Result.Name | Should -Be 'Hazard', 'Alonso'
                 $Result.Club | Should -Be 'Chelsea', 'Chelsea'
                 $Result.Position | Should -Be 'Midfielder', 'Defender'
             }

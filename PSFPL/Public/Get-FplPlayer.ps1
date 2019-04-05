@@ -80,7 +80,7 @@ function Get-FplPlayer {
     }
     Process {
         $Output = $Players.Where{
-            $_.WebName -match $Name -and
+            $_.Name -match $Name -and
             $_.Position -match $Position -and
             $_.Club -match $Club -and
             $_.Price -le $MaxPrice

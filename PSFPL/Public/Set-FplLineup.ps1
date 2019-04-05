@@ -79,7 +79,7 @@ function Set-FplLineup {
 
     $PlayerNames = $PlayersIn + $PlayersOut + @($Captain, $ViceCaptain) | Where-Object {$_}
     foreach ($Name in $PlayerNames) {
-        if ($Name -notin $Lineup.WebName) {
+        if ($Name -notin $Lineup.Name) {
             Write-Error -Message "There is no player with the name '$Name' in your team" -ErrorAction 'Stop'
         }
     }

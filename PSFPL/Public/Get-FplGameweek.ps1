@@ -54,7 +54,7 @@ function Get-FplGameweek {
         $Gameweeks.Where{$_.IsCurrent}
     }
     elseif ($Gameweek -gt 0) {
-        $Gameweeks.Where{$_.Id -eq $Gameweek}
+        $Gameweeks.Where{$_.Gameweek -eq $Gameweek}
     }
     else {
         $Gameweeks

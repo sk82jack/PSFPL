@@ -14,12 +14,12 @@ InModuleScope 'PSFPL' {
             }
             Mock Get-FplLineup {
                 [PSCustomObject]@{
-                    WebName       = 'Sterling'
+                    Name       = 'Sterling'
                     IsCaptain     = $false
                     IsViceCaptain = $false
                 },
                 [PSCustomObject]@{
-                    WebName       = 'Digne'
+                    Name       = 'Digne'
                     IsCaptain     = $false
                     IsViceCaptain = $false
                 }

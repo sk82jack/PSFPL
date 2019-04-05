@@ -58,7 +58,7 @@ function ConvertTo-FplObject {
     $TextInfo = (Get-Culture).TextInfo
     foreach ($Object in $InputObject) {
         $Hashtable = [ordered]@{}
-        $Object.psobject.properties | Foreach-Object {
+        $Object.psobject.properties | ForEach-Object {
             $Name = $TextInfo.ToTitleCase($_.Name) -replace '_' -replace 'Team', 'Club' -replace 'Entry', 'Team' -replace 'Event', 'Gameweek'
             $Value = if ($_.Value -is [string]) {
                 $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($_.Value))
@@ -74,12 +74,14 @@ function ConvertTo-FplObject {
             'FplPlayer' {
                 $Hashtable['PlayerId'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
+                $Hashtable['Name'] = $Hashtable['WebName']
                 $Hashtable['Position'] = $PositionHash[$Object.element_type]
                 $Hashtable['ClubId'] = $Hashtable['Club']
                 $Hashtable['Club'] = $TeamHash[$Hashtable['Club']]
                 $Hashtable['Price'] = $Object.now_cost / 10
             }
             'FplGameweek' {
+                $Hashtable['GameweekId'] = $Hashtable['Id']
                 $Hashtable['Gameweek'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
                 $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
@@ -180,7 +182,7 @@ function ConvertTo-FplObject {
                     $Hashtable['PlayingStatus'] = 'Substitute'
                 }
                 $CurrentPlayer = $Players.Where{$_.PlayerId -eq $Hashtable['PlayerId']}
-                foreach ($Property in 'WebName', 'Position', 'Club') {
+                foreach ($Property in 'Name', 'Position', 'Club') {
                     $Hashtable[$Property] = $CurrentPlayer.$Property
                 }
                 $Hashtable['SellingPrice'] = $Hashtable['SellingPrice'] / 10
