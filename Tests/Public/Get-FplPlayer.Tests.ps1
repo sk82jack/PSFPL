@@ -6,7 +6,7 @@ InModuleScope 'PSFPL' {
             Mock ConvertTo-FplObject {
                 @(
                     [pscustomobject]@{
-                        WebName     = 'Ederson'
+                        Name     = 'Ederson'
                         Position    = 'Goalkeeper'
                         Club        = 'Man City'
                         Price       = 5.8
@@ -14,7 +14,7 @@ InModuleScope 'PSFPL' {
                         TotalPoints = 62
                     },
                     [pscustomobject]@{
-                        WebName     = 'Alonso'
+                        Name     = 'Alonso'
                         Position    = 'Defender'
                         Club        = 'Chelsea'
                         Price       = 7.1
@@ -22,7 +22,7 @@ InModuleScope 'PSFPL' {
                         TotalPoints = 86
                     },
                     [pscustomobject]@{
-                        WebName     = 'Richarlison'
+                        Name     = 'Richarlison'
                         Position    = 'Midfielder'
                         Club        = 'Everton'
                         Price       = 7.0
@@ -30,7 +30,7 @@ InModuleScope 'PSFPL' {
                         TotalPoints = 59
                     },
                     [pscustomobject]@{
-                        WebName     = 'Arnautovic'
+                        Name     = 'Arnautovic'
                         Position    = 'Forward'
                         Club        = 'West Ham'
                         Price       = 7.1
@@ -47,30 +47,30 @@ InModuleScope 'PSFPL' {
             }
             It 'Filters correctly on the Name parameter' {
                 $Result = Get-FplPlayer -Name 'Ederson'
-                $Result.WebName | Should -Be 'Ederson'
+                $Result.Name | Should -Be 'Ederson'
 
                 $Result = Get-FplPlayer -Name 'ar'
-                $Result.WebName | Should -Contain 'Arnautovic'
-                $Result.WebName | Should -Contain 'Richarlison'
-                $Result.WebName | Should -Not -Contain 'Ederson'
+                $Result.Name | Should -Contain 'Arnautovic'
+                $Result.Name | Should -Contain 'Richarlison'
+                $Result.Name | Should -Not -Contain 'Ederson'
             }
             It 'accepts pipeline input on the Name parameter' {
                 $Result = 'Ederson' | Get-FplPlayer
-                $Result.WebName | Should -Be 'Ederson'
+                $Result.Name | Should -Be 'Ederson'
             }
             It 'Filters correctly on the Position parameter' {
                 $Result = Get-FplPlayer -Position 'Defender'
-                $Result.WebName | Should -Be 'Alonso'
+                $Result.Name | Should -Be 'Alonso'
             }
             It 'Filters correctly on the Club parameter' {
                 $Result = Get-FplPlayer -Club 'Chelsea'
-                $Result.WebName | Should -Be 'Alonso'
+                $Result.Name | Should -Be 'Alonso'
             }
             It 'Filters correctly on the MaxPrice parameter' {
                 $Result = Get-FplPlayer -MaxPrice 7
                 $Result.count | Should -Be 2
-                $Result.WebName | Should -Contain 'Ederson'
-                $Result.WebName | Should -Not -Contain 'Alonso'
+                $Result.Name | Should -Contain 'Ederson'
+                $Result.Name | Should -Not -Contain 'Alonso'
             }
             It 'Sorts by TotalPoints' {
                 $Result = Get-FplPlayer
@@ -92,8 +92,8 @@ InModuleScope 'PSFPL' {
                 $Result = Get-FplPlayer -DreamTeam
             }
             It 'Only lists players in the dream team' {
-                $Result.WebName | Should -Contain 'Alonso'
-                $Result.WebName | Should -Not -Contain 'Arnautovic'
+                $Result.Name | Should -Contain 'Alonso'
+                $Result.Name | Should -Not -Contain 'Arnautovic'
             }
 
             It 'Outputs the dream team in the correct order' {
