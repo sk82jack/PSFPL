@@ -49,14 +49,14 @@ function Invoke-FplLineupSwap {
                 {[Fpl.Player.Position]$_.Position + $_.PositionNumber}
             )
             $NewStarters = $Starters | Sort-Object $SortOrder
-        $Lineup = $NewStarters + $Substitutes
-        $Counter = 1
-        $Lineup.Foreach{
-            $_.PositionNumber = $Counter
-            $Counter++
+            $Lineup = $NewStarters + $Substitutes
+            $Counter = 1
+            $Lineup.Foreach{
+                $_.PositionNumber = $Counter
+                $Counter++
+            }
         }
     }
-}
 
-$Lineup
+    $Lineup
 }
