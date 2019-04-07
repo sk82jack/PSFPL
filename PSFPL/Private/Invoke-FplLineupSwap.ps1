@@ -2,14 +2,18 @@ function Invoke-FplLineupSwap {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
+        [PSTypeName('FplLineup')]
+        [PSObject[]]
         $Lineup,
 
         [Parameter(Mandatory)]
-        [string[]]
+        [PSTypeName('FplLineup')]
+        [PSObject[]]
         $PlayersIn,
 
         [Parameter(Mandatory)]
-        [string[]]
+        [PSTypeName('FplLineup')]
+        [PSObject[]]
         $PlayersOut
     )
 
@@ -31,19 +35,19 @@ function Invoke-FplLineupSwap {
     Add-Type -TypeDefinition $Def
 
     foreach ($Index in 0..($PlayersIn.Count - 1)) {
-        $InPlayer = $Lineup.Where{$_.Name -eq $PlayersIn[$Index]}[0].psobject.copy()
-        $OutPlayer = $Lineup.Where{$_.Name -eq $PlayersOut[$Index]}[0].psobject.copy()
+        $InPlayer = $PlayersIn[$Index].psobject.copy()
+        $OutPlayer = $PlayersOut[$Index].psobject.copy()
 
         foreach ($Property in 'PlayerId', 'Position', 'Name') {
-            $Lineup.Where{$_.PositionNumber -eq $OutPlayer.PositionNumber}[0].$Property = $InPlayer[0].$Property
-            $Lineup.Where{$_.PositionNumber -eq $InPlayer.PositionNumber}[0].$Property = $OutPlayer[0].$Property
+            $Lineup.Where{$_.PositionNumber -eq $OutPlayer.PositionNumber}[0].$Property = $InPlayer.$Property
+            $Lineup.Where{$_.PositionNumber -eq $InPlayer.PositionNumber}[0].$Property = $OutPlayer.$Property
         }
 
         $IsSamePosition = $InPlayer.Position -eq $OutPlayer.Position
         $AreBothSubstitutes = $InPlayer.IsSub -and $OutPlayer.IsSub
 
         if ((-not $IsSamePosition) -and (-not $AreBothSubstitutes)) {
-            $Starters, $Substitutes = $Lineup.Where( {-not $_.IsSub}, 'Split' )
+            $Starters, $Substitutes = $Lineup.Where( {-not $_.IsSub}, 'Split')
             $SortOrder = @(
                 {[enum]::GetNames([FPL.Player.Position]).IndexOf($_)}
                 {[Fpl.Player.Position]$_.Position + $_.PositionNumber}

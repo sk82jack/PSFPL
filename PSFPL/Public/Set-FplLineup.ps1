@@ -43,21 +43,23 @@ function Set-FplLineup {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [ValidateCount(1, 4)]
-        [string[]]
+        [ValidateCount(0, 4)]
+        [PlayerTransformAttribute()]
+        [PSObject[]]
         $PlayersIn,
 
         [Parameter()]
-        [ValidateCount(1, 4)]
-        [string[]]
+        [ValidateCount(0, 4)]
+        [PlayerTransformAttribute()]
+        [PSObject[]]
         $PlayersOut,
 
         [Parameter()]
-        [string]
+        [PlayerTransformAttribute()]
         $Captain,
 
         [Parameter()]
-        [string]
+        [PlayerTransformAttribute()]
         $ViceCaptain
     )
 
@@ -77,23 +79,26 @@ function Set-FplLineup {
 
     $Lineup = Get-FplLineup
 
-    $PlayerNames = $PlayersIn + $PlayersOut + @($Captain, $ViceCaptain) | Where-Object {$_}
-    foreach ($Name in $PlayerNames) {
-        if ($Name -notin $Lineup.Name) {
-            Write-Error -Message "There is no player with the name '$Name' in your team" -ErrorAction 'Stop'
+    $Players = [PSCustomObject]@{
+        In          = Find-FplPlayer -PlayerTransform $PlayersIn -FplPlayerCollection $Lineup
+        Out         = Find-FplPlayer -PlayerTransform $PlayersOut -FplPlayerCollection $Lineup
+        Captain     = Find-FplPlayer -PlayerTransform $Captain -FplPlayerCollection $Lineup
+        ViceCaptain = Find-FplPlayer -PlayerTransform $ViceCaptain -FplPlayerCollection $Lineup
+    }
+
+    $PlayerCollection = @($Players.In) + @($Players.Out) + @($Players.Captain, $Players.ViceCaptain) | Where-Object {$_}
+    foreach ($Player in $PlayerCollection) {
+        if ($Player.PlayerId -notin $Lineup.PlayerId) {
+            $Message = 'There is no player with the name "{0}" in your team' -f $Player.Name
+            Write-Error -Message $Message -ErrorAction 'Stop'
         }
     }
-
-    if ($PlayersIn -and $PlayersOut) {
-        $Lineup = Invoke-FplLineupSwap -Lineup $Lineup -PlayersIn $PlayersIn -PlayersOut $PlayersOut
+    if ($Players.In -and $Players.Out) {
+        $Lineup = Invoke-FplLineupSwap -Lineup $Lineup -PlayersIn $Players.In -PlayersOut $Players.Out
     }
-
-    $CaptainParams = @{
-        Lineup = $Lineup
+    if ($Captain -or $ViceCaptain) {
+        $Lineup = Set-FplLineupCaptain -Lineup $Lineup -Captain $Players.Captain -ViceCaptain $Players.ViceCaptain
     }
-    if ($Captain) {$CaptainParams['Captain'] = $Captain}
-    if ($ViceCaptain) {$CaptainParams['ViceCaptain'] = $ViceCaptain}
-    if ($CaptainParams) {$Lineup = Set-FplLineupCaptain @CaptainParams}
 
     Assert-FplLineup -Lineup $Lineup.Where{-not $_.IsSub}
 
@@ -122,5 +127,11 @@ function Set-FplLineup {
         }
     }
 
-    $Response = Invoke-RestMethod @Params
+    try {
+        $Response = Invoke-RestMethod @Params -ErrorAction 'Stop'
+    }
+    catch {
+        $Response = Get-ErrorResponsePayload -ErrorObject $_ | ConvertFrom-Json
+        Write-FplError -FplError $Response
+    }
 }
