@@ -6,7 +6,7 @@ InModuleScope 'PSFPL' {
             Mock ConvertTo-FplObject {
                 @(
                     [pscustomobject]@{
-                        Name     = 'Ederson'
+                        Name        = 'Ederson'
                         Position    = 'Goalkeeper'
                         Club        = 'Man City'
                         Price       = 5.8
@@ -14,7 +14,7 @@ InModuleScope 'PSFPL' {
                         TotalPoints = 62
                     },
                     [pscustomobject]@{
-                        Name     = 'Alonso'
+                        Name        = 'Alonso'
                         Position    = 'Defender'
                         Club        = 'Chelsea'
                         Price       = 7.1
@@ -22,7 +22,7 @@ InModuleScope 'PSFPL' {
                         TotalPoints = 86
                     },
                     [pscustomobject]@{
-                        Name     = 'Richarlison'
+                        Name        = 'Richarlison'
                         Position    = 'Midfielder'
                         Club        = 'Everton'
                         Price       = 7.0
@@ -30,7 +30,7 @@ InModuleScope 'PSFPL' {
                         TotalPoints = 59
                     },
                     [pscustomobject]@{
-                        Name     = 'Arnautovic'
+                        Name        = 'Arnautovic'
                         Position    = 'Forward'
                         Club        = 'West Ham'
                         Price       = 7.1
@@ -45,14 +45,17 @@ InModuleScope 'PSFPL' {
                 $Results = Get-FplPlayer
                 $Results.count | Should -Be 4
             }
-            It 'Filters correctly on the Name parameter' {
+            It 'filters correctly on the Name parameter' {
                 $Result = Get-FplPlayer -Name 'Ederson'
                 $Result.Name | Should -Be 'Ederson'
 
-                $Result = Get-FplPlayer -Name 'ar'
+                $Result = Get-FplPlayer -Name '*ar*'
                 $Result.Name | Should -Contain 'Arnautovic'
                 $Result.Name | Should -Contain 'Richarlison'
                 $Result.Name | Should -Not -Contain 'Ederson'
+
+                $Result = Get-FplPlayer -Name 'ar'
+                $Result | Should -BeNullOrEmpty
             }
             It 'accepts pipeline input on the Name parameter' {
                 $Result = 'Ederson' | Get-FplPlayer
