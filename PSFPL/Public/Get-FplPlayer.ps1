@@ -43,10 +43,12 @@ function Get-FplPlayer {
     Param (
         [Parameter(
             ParameterSetName = 'Filter',
-            ValueFromPipeline
+            ValueFromPipeline,
+            Position = 0
         )]
+        [SupportsWildcards()]
         [string]
-        $Name,
+        $Name = '*',
 
         [Parameter(ParameterSetName = 'Filter')]
         [ValidateSet('Forward', 'Midfielder', 'Defender', 'Goalkeeper')]
@@ -79,6 +81,7 @@ function Get-FplPlayer {
         $Players = ConvertTo-FplObject -InputObject $Response -Type 'FplPlayer' | Sort-Object TotalPoints, Price -Descending
     }
     Process {
+        $Name = '^{0}$' -f ($Name -replace '\*', '.*')
         $Output = $Players.Where{
             $_.Name -match $Name -and
             $_.Position -match $Position -and
