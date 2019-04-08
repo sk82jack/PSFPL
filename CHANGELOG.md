@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed a bug in Set-FplLineup which meant you could not sub on a player and captain him with the same command.
+- Fixed a bug in Set-FplLineup in PowerShell Core causing you to only be able to bring on subs in the same position i.e. swap a forward for a forward.
 
 ## [2.0] - 2019-04-08
 ### Added
