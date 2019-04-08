@@ -1,4 +1,80 @@
 function Invoke-FplTransfer {
+    <#
+    .SYNOPSIS
+        Makes a transfer for the upcoming gameweek
+    .DESCRIPTION
+        Makes a transfer for the upcoming gameweek
+    .PARAMETER PlayersIn
+        The player(s) which you wish to transfer into your team.
+        This parameter takes multiple types of input:
+            It can be passed as a string
+            `'Salah'`
+
+            It can be passed as a player ID
+            `253`
+
+            It can be passed as a hashtable of properties i.e.
+            `@{Name = 'Salah'; Club = 'Liverpool'; Position = 'Midfeilder'; PlayerID = 253}`
+            The only allowed properties are Name, Club, Position, PlayerID
+
+            It can be the output of Get-FplPlayer or Get-FplLineup
+    .PARAMETER PlayersOut
+        The player(s) which you wish to transfer out of your team.
+        This parameter takes multiple types of input:
+            It can be passed as a string
+            `'Salah'`
+
+            It can be passed as a player ID
+            `253`
+
+            It can be passed as a hashtable of properties i.e.
+            `@{Name = 'Salah'; Club = 'Liverpool'; Position = 'Midfeilder'; PlayerID = 253}`
+            The only allowed properties are Name, Club, Position, PlayerID
+
+            It can be the output of Get-FplPlayer or Get-FplLineup
+    .PARAMETER ActivateChip
+        Use this parameter to activate your Wildcard or Free Hit
+    .PARAMETER Force
+        By default this function will do a confirmation prompt.
+        If you wish to suppress this prompt use the Force parameter.
+    .EXAMPLE
+        Invoke-FplTransfer -PlayersIn Hazard -PlayersOut Salah
+
+        This example just uses the players names to identify them.
+    .EXAMPLE
+        Invoke-FplTransfer -PlayersIn Hazard, Robertson -PlayersOut Salah, Alonso
+
+        This example demonstrates passing multiple players to the parameters
+    .EXAMPLE
+        Invoke-FplTransfer -PlayersIn 122 -PlayersOut 253
+
+        This example uses the player IDs to identify them. 122 is Hazard and 253 is Salah.
+        You can find a player ID by doing `Get-FplPlayer Hazard | Select PlayerID`
+    .EXAMPLE
+        Invoke-FplTransfer -PlayersIn @{Name = 'Sterling'; Club = 'Man City'} -PlayersOut Mane
+
+        This example uses a hashtable to identify Sterling because there is another player in
+        the game called Sterling who plays for Spurs.
+    .EXAMPLE
+        $Hazard = Get-FplPlayer -Name 'Hazard'
+        $Salah = Get-FplLineup | Where Name -eq 'Salah'
+        Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Salah
+
+        This example shows that you can use the objects directly from Get-FplPlayer and Get-FplLineup
+    .EXAMPLE
+        Invoke-FplTransfer -PlayersIn Hazard, Robertson -PlayersOut Salah, Alonso -ActivateChip Wildcard
+
+        This example shows how to activate your Wildcard
+    .EXAMPLE
+        Invoke-FplTransfer -PlayersIn Hazard, Robertson -PlayersOut Salah, Alonso -ActivateChip FreeHit
+
+        This example shows how to activate your Free Hit
+    .LINK
+        https://psfpl.readthedocs.io/en/master/functions/Invoke-FplTransfer
+    .LINK
+        https://github.com/sk82jack/PSFPL/blob/master/PSFPL/Public/Invoke-FplTransfer.ps1
+    #>
+
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]

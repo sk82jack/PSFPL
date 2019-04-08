@@ -7,9 +7,34 @@ function Set-FplLineup {
     .PARAMETER PlayersIn
         The players which you wish to bring in to the starting XI.
         Alternatively, if you are just swapping the order of players on your bench then use PlayersIn for one bench player and PlayersOut for the other
+        This parameter takes multiple types of input:
+            It can be passed as a string
+            `'Salah'`
+
+            It can be passed as a player ID
+            `253`
+
+            It can be passed as a hashtable of properties i.e.
+            `@{Name = 'Salah'; Club = 'Liverpool'; Position = 'Midfeilder'; PlayerID = 253}`
+            The only allowed properties are Name, Club, Position, PlayerID
+
+            It can be the output of Get-FplPlayer or Get-FplLineup
     .PARAMETER PlayersOut
         The players you wish to remove from the starting XI.
-        Alternatively, if you are just swapping the order of players on your bench then use PlayersIn for one bench player and PlayersOut for the other
+        Alternatively, if you are just swapping the order of players on your bench then use
+        PlayersIn for one bench player and PlayersOut for the other.
+        This parameter takes multiple types of input:
+            It can be passed as a string
+            `'Salah'`
+
+            It can be passed as a player ID
+            `253`
+
+            It can be passed as a hashtable of properties i.e.
+            `@{Name = 'Salah'; Club = 'Liverpool'; Position = 'Midfeilder'; PlayerID = 253}`
+            The only allowed properties are Name, Club, Position, PlayerID
+
+            It can be the output of Get-FplPlayer or Get-FplLineup
     .PARAMETER Captain
         The player who you wish to be Captain of your team
     .PARAMETER ViceCaptain
@@ -22,6 +47,10 @@ function Set-FplLineup {
         Set-FplLineup -PlayersIn Son, Rashford, Alexander-Arnold -PlayersOut Ings, Diop, Digne
 
         This will remove Ings, Diop and Digne from the starting XI and swap them with Son, Rashford and Alexander-Arnold
+    .EXAMPLE
+        Set-FplLineup -PlayersIn @{Name = 'Sterling'; Club = 'Man City'} -PlayersOut Mane
+
+        You can use a hashtable to identify players if you have two players with the same name in your team.
     .EXAMPLE
         Set-FplLineup -Captain Salah
 
