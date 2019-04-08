@@ -24,7 +24,7 @@ function Invoke-FplLineupSwap {
             {
                 public enum Position
                 {
-                    GoalKeeper = 0,
+                    Goalkeeper = 0,
                     Defender = 100,
                     Midfielder = 200,
                     Forward = 300
@@ -50,7 +50,7 @@ function Invoke-FplLineupSwap {
             $Starters, $Substitutes = $Lineup.Where( {-not $_.IsSub}, 'Split')
             $SortOrder = @(
                 {[enum]::GetNames([FPL.Player.Position]).IndexOf($_)}
-                {[Fpl.Player.Position]$_.Position + $_.PositionNumber}
+                {[Fpl.Player.Position]$_.Position + [int]$_.PositionNumber}
             )
             $NewStarters = $Starters | Sort-Object $SortOrder
             $Lineup = $NewStarters + $Substitutes
