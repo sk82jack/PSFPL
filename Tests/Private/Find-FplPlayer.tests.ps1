@@ -130,17 +130,20 @@ InModuleScope 'PSFPL' {
             $PlayerTransform = [PSCustomObject]@{
                 Name = '^Digne$'
             }
-            Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup | Should -Be $Digne
+            $Output = Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup
+            $Output.PlayerID | Should -Be 484
         }
         It 'finds a player based on player ID' {
             $PlayerTransform = [PSCustomObject]@{
                 PlayerID = 484
             }
-            Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup | Should -Be $Digne
+            $Output = Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup
+            $Output.PlayerID | Should -Be 484
         }
         It 'finds a player based on FplLineup type' {
             $PlayerTransform = $Digne
-            Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup | Should -Be $Digne
+            $Output = Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup
+            $Output.PlayerID | Should -Be 484
         }
         It 'throws if multiple matches are found' {
             $PlayerTransform = [PSCustomObject]@{
