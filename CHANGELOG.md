@@ -6,19 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Invoke-FplTransfer - a function to transfer players in and out of your team and activate your wildcard/free hit
+- Added support for PowerShell Core
 - Get-FplLineup - a function to retreive the users lineup for the upcoming gameweek
 - Set-FplLineup - a function to make changes to the users lineup for the upcoming gameweek
 
 ### Changed
+- The Name parameter for Get-FplPlayer now supports wildcard searches. Before it would do a partial search by default with no way to turn partial searching off so searching for players like Son was an issue. The new behaviour is that the whole name must match unless wildcards are specified.
 - Improve performance by caching a users team ID
 
 ### Deprecated
+- The WebName parameter on FplPlayer objects has been deprecated. Going forward the parameter will be Name instead. WebName still exists for backwards compatibility but it is considered legacy
 
 ### Removed
-
-### Fixed
-
-### Security
+- The Id parameter on FplGameweek objects has been removed. Going forward the parameter will be Gameweek or GameweekId instead.
 
 ## [1.0.3] - 2019-02-09
 
