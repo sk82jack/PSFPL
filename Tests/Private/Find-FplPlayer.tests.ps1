@@ -1,7 +1,7 @@
 Import-Module $ENV:BHPSModuleManifest -Force
 InModuleScope 'PSFPL' {
-    Describe 'Invoke-FplLineupSwap' {
-        BeforeEach {
+    Describe 'Find-FplPlayer' {
+        BeforeAll {
             $Fabianski = [PSCustomObject]@{
                 PSTypeName     = 'FplLineup'
                 PositionNumber = 1
@@ -98,11 +98,11 @@ InModuleScope 'PSFPL' {
                 Position       = 'Goalkeeper'
                 IsSub          = $true
             }
-            $Ings = [PSCustomObject]@{
+            $Sterling2 = [PSCustomObject]@{
                 PSTypeName     = 'FplLineup'
                 PositionNumber = 13
-                PlayerId       = 258
-                Name           = 'Ings'
+                PlayerId       = 578
+                Name           = 'Sterling'
                 Position       = 'Forward'
                 IsSub          = $true
             }
@@ -122,52 +122,46 @@ InModuleScope 'PSFPL' {
                 Position       = 'Defender'
                 IsSub          = $true
             }
-            $Params = @{
-                Lineup = $Fabianski, $Bednarek, $Bennett, $AlexanderArnold, $Pogba, $Sane, $Salah,
-                $Sterling, $Son, $Rashford, $Jiminez, $Hamer, $Ings, $Digne, $Diop
+
+            $Lineup = $Fabianski, $Bednarek, $Bennett, $AlexanderArnold, $Pogba, $Sane, $Salah,
+            $Sterling, $Son, $Rashford, $Jiminez, $Hamer, $Sterling2, $Digne, $Diop
+        }
+        It 'finds a player based on name' {
+            $PlayerTransform = [PSCustomObject]@{
+                Name = '^Digne$'
             }
+            Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup | Should -Be $Digne
         }
-        It 'swaps a single player of the same position' {
-            $Params['PlayersIn'] = $Ings
-            $Params['PlayersOut'] = $Rashford
-            $Result = Invoke-FplLineupSwap @Params
-            $Result[9].Name | Should -Be 'Ings'
-            $Result[12].Name | Should -Be 'Rashford'
+        It 'finds a player based on player ID' {
+            $PlayerTransform = [PSCustomObject]@{
+                PlayerID = 484
+            }
+            Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup | Should -Be $Digne
         }
-        It 'swaps multiple players of the same positions' {
-            $Params['PlayersIn'] = $Ings, $Diop, $Digne
-            $Params['PlayersOut'] = $Rashford, $Bednarek, $Bennett
-            $Result = Invoke-FplLineupSwap @Params
-            $Result[9].Name | Should -Be 'Ings'
-            $Result[12].Name | Should -Be 'Rashford'
-            $Result[1].Name | Should -Be 'Diop'
-            $Result[14].Name | Should -Be 'Bednarek'
-            $Result[2].Name | Should -Be 'Digne'
-            $Result[13].Name | Should -Be 'Bennett'
+        It 'finds a player based on FplLineup type' {
+            $PlayerTransform = $Digne
+            Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup | Should -Be $Digne
         }
-        It 'swaps a single player of a different type' {
-            $Params['PlayersIn'] = $Ings
-            $Params['PlayersOut'] = $Bennett
-            $Result = Invoke-FplLineupSwap @Params
-            $Result[8].Name | Should -Be 'Ings'
-            $Result[12].Name | Should -Be 'Bennett'
+        It 'throws if multiple matches are found' {
+            $PlayerTransform = [PSCustomObject]@{
+                Name = '^Sterling$'
+            }
+            $ExpectedMessage = 'Multiple players found that match "Sterling"'
+            {Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup} | Should -Throw -ExpectedMessage $ExpectedMessage
         }
-        It 'swaps multiple players of different types' {
-            $Params['PlayersIn'] = $Ings, $Diop, $Digne
-            $Params['PlayersOut'] = $Son, $Rashford, $Sane
-            $Result = Invoke-FplLineupSwap @Params
-            $Result[9].Name | Should -Be 'Ings'
-            $Result[12].Name | Should -Be 'Son'
-            $Result[4].Name | Should -Be 'Diop'
-            $Result[14].Name | Should -Be 'Rashford'
-            $Result[5].Name | Should -Be 'Digne'
-            $Result[13].Name | Should -Be 'Sane'
+        It 'throws if a player cannot be found in a lineup' {
+            $PlayerTransform = [PSCustomObject]@{
+                Name = '^Ings$'
+            }
+            $ExpectedMessage = 'The player "Ings" cannot be found in your team.'
+            {Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup} | Should -Throw -ExpectedMessage $ExpectedMessage
         }
-        It 'sorts the new starting XI' {
-            $Params['PlayersIn'] = $Ings, $Diop, $Digne
-            $Params['PlayersOut'] = $Son, $Rashford, $Sane
-            $Result = Invoke-FplLineupSwap @Params
-            $Result.PositionNumber | Should -Be (1..15)
+        It 'throws if a player cannot be found in general' {
+            $PlayerTransform = [PSCustomObject]@{
+                Name = '^Ings$'
+            }
+            $ExpectedMessage = 'The player "Ings" does not exist with the specified properties.'
+            {Find-FplPlayer -PlayerTransform $PlayerTransform -FplPlayerCollection $Lineup[0..5]} | Should -Throw -ExpectedMessage $ExpectedMessage
         }
     }
 }

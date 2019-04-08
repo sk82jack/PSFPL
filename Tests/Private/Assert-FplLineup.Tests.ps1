@@ -5,72 +5,92 @@ InModuleScope 'PSFPL' {
             $NoKeepers = @()
             $TwoKeepers = @(
                 [PSCustomObject]@{
-                    Position = 'GoalKeeper'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'GoalKeeper'
                 },
                 [PSCustomObject]@{
-                    Position = 'GoalKeeper'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'GoalKeeper'
                 }
             )
             $NoDefenders = @(
                 [PSCustomObject]@{
-                    Position = 'GoalKeeper'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'GoalKeeper'
                 }
             )
             $NoMidfielders = @(
                 [PSCustomObject]@{
-                    Position = 'GoalKeeper'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'GoalKeeper'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 }
             )
             $NoForwards = @(
                 [PSCustomObject]@{
-                    Position = 'GoalKeeper'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'GoalKeeper'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Midfielder'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Midfielder'
                 },
                 [PSCustomObject]@{
-                    Position = 'Midfielder'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Midfielder'
                 }
             )
             $GoodLineup = @(
                 [PSCustomObject]@{
-                    Position = 'GoalKeeper'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'GoalKeeper'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Defender'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Defender'
                 },
                 [PSCustomObject]@{
-                    Position = 'Midfielder'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Midfielder'
                 },
                 [PSCustomObject]@{
-                    Position = 'Midfielder'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Midfielder'
                 },
                 [PSCustomObject]@{
-                    Position = 'Forward'
+                    PSTypeName = 'FplLineup'
+                    Position   = 'Forward'
                 }
             )
         }

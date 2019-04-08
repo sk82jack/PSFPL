@@ -7,9 +7,34 @@ function Set-FplLineup {
     .PARAMETER PlayersIn
         The players which you wish to bring in to the starting XI.
         Alternatively, if you are just swapping the order of players on your bench then use PlayersIn for one bench player and PlayersOut for the other
+        This parameter takes multiple types of input:
+            It can be passed as a string
+            `'Salah'`
+
+            It can be passed as a player ID
+            `253`
+
+            It can be passed as a hashtable of properties i.e.
+            `@{Name = 'Salah'; Club = 'Liverpool'; Position = 'Midfeilder'; PlayerID = 253}`
+            The only allowed properties are Name, Club, Position, PlayerID
+
+            It can be the output of Get-FplPlayer or Get-FplLineup
     .PARAMETER PlayersOut
         The players you wish to remove from the starting XI.
-        Alternatively, if you are just swapping the order of players on your bench then use PlayersIn for one bench player and PlayersOut for the other
+        Alternatively, if you are just swapping the order of players on your bench then use
+        PlayersIn for one bench player and PlayersOut for the other.
+        This parameter takes multiple types of input:
+            It can be passed as a string
+            `'Salah'`
+
+            It can be passed as a player ID
+            `253`
+
+            It can be passed as a hashtable of properties i.e.
+            `@{Name = 'Salah'; Club = 'Liverpool'; Position = 'Midfeilder'; PlayerID = 253}`
+            The only allowed properties are Name, Club, Position, PlayerID
+
+            It can be the output of Get-FplPlayer or Get-FplLineup
     .PARAMETER Captain
         The player who you wish to be Captain of your team
     .PARAMETER ViceCaptain
@@ -22,6 +47,10 @@ function Set-FplLineup {
         Set-FplLineup -PlayersIn Son, Rashford, Alexander-Arnold -PlayersOut Ings, Diop, Digne
 
         This will remove Ings, Diop and Digne from the starting XI and swap them with Son, Rashford and Alexander-Arnold
+    .EXAMPLE
+        Set-FplLineup -PlayersIn @{Name = 'Sterling'; Club = 'Man City'} -PlayersOut Mane
+
+        You can use a hashtable to identify players if you have two players with the same name in your team.
     .EXAMPLE
         Set-FplLineup -Captain Salah
 
@@ -43,21 +72,23 @@ function Set-FplLineup {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [ValidateCount(1, 4)]
-        [string[]]
+        [ValidateCount(0, 4)]
+        [PlayerTransformAttribute()]
+        [PSObject[]]
         $PlayersIn,
 
         [Parameter()]
-        [ValidateCount(1, 4)]
-        [string[]]
+        [ValidateCount(0, 4)]
+        [PlayerTransformAttribute()]
+        [PSObject[]]
         $PlayersOut,
 
         [Parameter()]
-        [string]
+        [PlayerTransformAttribute()]
         $Captain,
 
         [Parameter()]
-        [string]
+        [PlayerTransformAttribute()]
         $ViceCaptain
     )
 
@@ -77,23 +108,26 @@ function Set-FplLineup {
 
     $Lineup = Get-FplLineup
 
-    $PlayerNames = $PlayersIn + $PlayersOut + @($Captain, $ViceCaptain) | Where-Object {$_}
-    foreach ($Name in $PlayerNames) {
-        if ($Name -notin $Lineup.Name) {
-            Write-Error -Message "There is no player with the name '$Name' in your team" -ErrorAction 'Stop'
+    $Players = [PSCustomObject]@{
+        In          = Find-FplPlayer -PlayerTransform $PlayersIn -FplPlayerCollection $Lineup
+        Out         = Find-FplPlayer -PlayerTransform $PlayersOut -FplPlayerCollection $Lineup
+        Captain     = Find-FplPlayer -PlayerTransform $Captain -FplPlayerCollection $Lineup
+        ViceCaptain = Find-FplPlayer -PlayerTransform $ViceCaptain -FplPlayerCollection $Lineup
+    }
+
+    $PlayerCollection = @($Players.In) + @($Players.Out) + @($Players.Captain, $Players.ViceCaptain) | Where-Object {$_}
+    foreach ($Player in $PlayerCollection) {
+        if ($Player.PlayerId -notin $Lineup.PlayerId) {
+            $Message = 'There is no player with the name "{0}" in your team' -f $Player.Name
+            Write-Error -Message $Message -ErrorAction 'Stop'
         }
     }
-
-    if ($PlayersIn -and $PlayersOut) {
-        $Lineup = Invoke-FplLineupSwap -Lineup $Lineup -PlayersIn $PlayersIn -PlayersOut $PlayersOut
+    if ($Players.In -and $Players.Out) {
+        $Lineup = Invoke-FplLineupSwap -Lineup $Lineup -PlayersIn $Players.In -PlayersOut $Players.Out
     }
-
-    $CaptainParams = @{
-        Lineup = $Lineup
+    if ($Captain -or $ViceCaptain) {
+        $Lineup = Set-FplLineupCaptain -Lineup $Lineup -Captain $Players.Captain -ViceCaptain $Players.ViceCaptain
     }
-    if ($Captain) {$CaptainParams['Captain'] = $Captain}
-    if ($ViceCaptain) {$CaptainParams['ViceCaptain'] = $ViceCaptain}
-    if ($CaptainParams) {$Lineup = Set-FplLineupCaptain @CaptainParams}
 
     Assert-FplLineup -Lineup $Lineup.Where{-not $_.IsSub}
 
@@ -109,12 +143,12 @@ function Set-FplLineup {
     }
     $TeamId = $Script:FplSessionData['TeamID']
     $Params = @{
-        Uri                   = "https://fantasy.premierleague.com/drf/my-team/$TeamId/"
-        UseDefaultCredentials = $true
-        WebSession            = $FplSessionData['FplSession']
-        Method                = 'Post'
-        Body                  = ($Body | ConvertTo-Json)
-        Headers               = @{
+        Uri             = "https://fantasy.premierleague.com/drf/my-team/$TeamId/"
+        UseBasicParsing = $true
+        WebSession      = $FplSessionData['FplSession']
+        Method          = 'Post'
+        Body            = ($Body | ConvertTo-Json)
+        Headers         = @{
             'Content-Type'     = 'application/json; charset=UTF-8'
             'X-CSRFToken'      = $FplSessionData['CsrfToken']
             'X-Requested-With' = 'XMLHttpRequest'
@@ -122,5 +156,11 @@ function Set-FplLineup {
         }
     }
 
-    $Response = Invoke-RestMethod @Params
+    try {
+        $Response = Invoke-RestMethod @Params -ErrorAction 'Stop'
+    }
+    catch {
+        $Response = Get-ErrorResponsePayload -ErrorObject $_ | ConvertFrom-Json
+        Write-FplError -FplError $Response
+    }
 }

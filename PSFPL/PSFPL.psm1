@@ -3,7 +3,7 @@ param()
 Write-Verbose "This psm1 is replaced in the build output. This file is only used for debugging."
 Write-Verbose $PSScriptRoot
 Write-Verbose 'Import everything in sub folders'
-$FunctionFolders = @('Public', 'Private')
+$FunctionFolders = @('Classes', 'Public', 'Private')
 ForEach ($Folder in $FunctionFolders) {
     $FolderPath = Join-Path -Path $PSScriptRoot -ChildPath $Folder
     If (Test-Path -Path $FolderPath) {

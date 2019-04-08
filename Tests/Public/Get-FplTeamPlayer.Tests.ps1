@@ -67,9 +67,21 @@ InModuleScope 'PSFPL' {
                     }
                 }
             }
-            It 'calls Get-FplGameweek when no parameter is given' {
+            AfterEach {
+                Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
+            }
+            It 'calls Get-FplGameweek when no parameter is given and the user has not authenticated' {
                 $Result = Get-FplTeamPlayer -TeamId 123456
                 Assert-MockCalled Get-FplGameweek -Scope 'It'
+            }
+            It 'gets the current gameweek from the FplSessionData variable when authenticated' {
+                $Script:FplSessionData = @{
+                    CurrentGW = 27
+                }
+                $Result = Get-FplTeamPlayer -TeamId 123456
+                Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
+                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456/event/27/picks'
+                }
             }
         }
         Context 'When the game is updating' {

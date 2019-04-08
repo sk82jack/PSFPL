@@ -1,7 +1,8 @@
 function Assert-FplLineup {
     [CmdletBinding()]
     param (
-        [psobject[]]
+        [PSTypeName('FplLineup')]
+        [PSObject[]]
         $Lineup
     )
 
