@@ -42,7 +42,9 @@ InModuleScope 'PSFPL' {
         }
         BeforeEach {
             $Params = @{
-                Lineup = $Fabianski, $Bednarek, $Bennett, $Diop
+                Lineup = foreach ($Player in $Fabianski, $Bednarek, $Bennett, $Diop) {
+                    $Player.PSObject.Copy()
+                }
             }
         }
         It 'sets a new captain' {
@@ -60,6 +62,18 @@ InModuleScope 'PSFPL' {
             $Params['ViceCaptain'] = $Fabianski
             $Result = Set-FplLineupCaptain @Params
             $Result.Where{$_.IsCaptain}.Name | Should -Be 'Bennett'
+            $Result.Where{$_.IsViceCaptain}.Name | Should -Be 'Fabianski'
+        }
+        It 'handles setting the vice captain as the new captain' {
+            $Params['Captain'] = $Bednarek
+            $Result = Set-FplLineupCaptain @Params
+            $Result.Where{$_.IsCaptain}.Name | Should -Be 'Bednarek'
+            $Result.Where{$_.IsViceCaptain}.Name | Should -Be 'Fabianski'
+        }
+        It 'handles setting the captain as the new vice captain' {
+            $Params['ViceCaptain'] = $Fabianski
+            $Result = Set-FplLineupCaptain @Params
+            $Result.Where{$_.IsCaptain}.Name | Should -Be 'Bednarek'
             $Result.Where{$_.IsViceCaptain}.Name | Should -Be 'Fabianski'
         }
         It 'errors if a substitute is set as the new captain' {

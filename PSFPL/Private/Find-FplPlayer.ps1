@@ -12,23 +12,23 @@ Function Find-FplPlayer {
 
     foreach ($Player in $PlayerTransform) {
         if ($Player.PSTypeNames -contains 'FplLineup') {
-            $Player
+            $Player.PSObject.Copy()
             continue
         }
         $SearchName = $Player.Name -Replace '[.^$]'
-        if ($Player.PlayerId) {
-            $PlayerObj = $FplPlayerCollection.Where{$_.PlayerId -eq $Player.PlayerId}
+        $PlayerObj = if ($Player.PlayerId) {
+            $FplPlayerCollection.Where{$_.PlayerId -eq $Player.PlayerId}
         }
         else {
-            $PlayerObj = $FplPlayerCollection.Where{
+            $FplPlayerCollection.Where{
                 $_.Name -match $Player.Name -and
                 $_.Club -match $Player.Club -and
                 $_.Position -match $Player.Position
             }
-            if ($PlayerObj.Count -gt 1) {
-                $Message = 'Multiple players found that match "{0}"' -f $SearchName
-                Write-Error -Message $Message -ErrorAction 'Stop'
-            }
+        }
+        if (@($PlayerObj.Count) -gt 1) {
+            $Message = 'Multiple players found that match "{0}"' -f $SearchName
+            Write-Error -Message $Message -ErrorAction 'Stop'
         }
 
         if (-not $PlayerObj) {
@@ -42,6 +42,6 @@ Function Find-FplPlayer {
             Write-Error -Message $Message -ErrorAction 'Stop'
         }
 
-        $PlayerObj
+        $PlayerObj.PSObject.Copy()
     }
 }
