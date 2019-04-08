@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.0.1] - 2019-04-08
 ### Fixed
 - Fixed a bug in Set-FplLineup which meant you could not sub on a player and captain him with the same command.
 - Fixed a bug in Set-FplLineup in PowerShell Core causing you to only be able to bring on subs in the same position i.e. swap a forward for a forward.
@@ -48,7 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Get-FplPlayer - a function to retrieve player data
 - Connect-FPL - a function to log into the FPL API to retrieve data about your team
 
-[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v2.0..HEAD
+[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v2.0.1..HEAD
+[2.0.1]: https://github.com/sk82jack/PSFPL/compare/v2.0..v2.0.1
 [2.0]: https://github.com/sk82jack/PSFPL/compare/v1.0.3..v2.0
 [1.0.3]: https://github.com/sk82jack/PSFPL/compare/v1.0.2..v1.0.3
 [1.0.2]: https://github.com/sk82jack/PSFPL/compare/v1.0.1..v1.0.2
