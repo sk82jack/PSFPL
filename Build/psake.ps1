@@ -12,8 +12,8 @@ Properties {
         $Verbose = @{Verbose = $True}
     }
 
-    git config user.email 'pipeline@example.com'
-    git config user.name 'pipeline'
+    git config --global user.email 'pipeline@example.com'
+    git config --global user.name 'pipeline'
 }
 
 Task Default -Depends Test
