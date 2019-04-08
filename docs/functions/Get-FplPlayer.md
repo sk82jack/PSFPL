@@ -7,7 +7,8 @@ Retrieve a list of FPL players
 
 ### Filter (Default)
 ```
-Get-FplPlayer [-Name <String>] [-Position <String>] [-Club <String>] [-MaxPrice <Double>] [<CommonParameters>]
+Get-FplPlayer [[-Name] <String>] [-Position <String>] [-Club <String>] [-MaxPrice <Double>]
+ [<CommonParameters>]
 ```
 
 ### DreamTeam
@@ -66,10 +67,10 @@ Parameter Sets: Filter
 Aliases:
 
 Required: False
-Position: Named
-Default value: None
+Position: 1
+Default value: *
 Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
+Accept wildcard characters: True
 ```
 
 ### -Position
@@ -133,8 +134,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

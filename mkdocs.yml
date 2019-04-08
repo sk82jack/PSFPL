@@ -13,7 +13,10 @@ pages:
     - Get-FplGameweek: functions/Get-FplGameweek.md
     - Get-FplLeague: functions/Get-FplLeague.md
     - Get-FplLeagueTable: functions/Get-FplLeagueTable.md
+    - Get-FplLineup: functions/Get-FplLineup.md
     - Get-FplPlayer: functions/Get-FplPlayer.md
     - Get-FplTeam: functions/Get-FplTeam.md
     - Get-FplTeamPlayer: functions/Get-FplTeamPlayer.md
+    - Invoke-FplTransfer: functions/Invoke-FplTransfer.md
+    - Set-FplLineup: functions/Set-FplLineup.md
 
