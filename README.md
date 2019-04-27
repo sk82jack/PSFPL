@@ -5,7 +5,7 @@
 
 ## Description
 
-A PowerShell Module to connect to the FPL API
+A PowerShell Module to connect to and interact with the FPL API at https://fantasy.premierleague.com/
 
 Authored by Jack Denton
 
