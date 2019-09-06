@@ -11,9 +11,16 @@ function Get-FplElementId {
     #>
     [CmdletBinding()]
     param ()
-    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/elements/' -UseBasicParsing
     $Hashtable = @{}
-    foreach ($Element in $Response) {
+    if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['Players'])) {
+        $Bootstrap = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/bootstrap-static/' -UseBasicParsing
+        $Script:FplSessionData = @{
+            ElementTypes = $Bootstrap.element_types
+            Clubs        = $Bootstrap.teams
+            Players      = $Bootstrap.elements
+        }
+    }
+    foreach ($Element in $Script:FplSessionData['Players']) {
         $DiacriticName = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding('ISO-8859-1').GetBytes($Element.web_name))
         $Hashtable[$Element.id] = [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($DiacriticName))
     }

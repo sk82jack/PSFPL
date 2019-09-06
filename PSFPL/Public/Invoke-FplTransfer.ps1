@@ -138,21 +138,19 @@ function Invoke-FplTransfer {
     }
 
     $Params = @{
-        Uri             = "https://fantasy.premierleague.com/drf/transfers"
+        Uri             = "https://fantasy.premierleague.com/api/transfers/"
         UseBasicParsing = $true
         WebSession      = $FplSessionData['FplSession']
         Method          = 'Post'
         Body            = ($Body | ConvertTo-Json)
         Headers         = @{
-            'Content-Type'     = 'application/json; charset=UTF-8'
-            'X-CSRFToken'      = $FplSessionData['CsrfToken']
-            'X-Requested-With' = 'XMLHttpRequest'
-            'Referer'          = 'https://fantasy.premierleague.com/a/squad/transfers'
+            'Content-Type' = 'application/json'
+            'Referer'      = 'https://fantasy.premierleague.com/transfers'
         }
     }
 
     try {
-        $ConfirmationResponse = Invoke-RestMethod @Params -ErrorAction 'Stop'
+        $Response = Invoke-RestMethod @Params -ErrorAction 'Stop'
     }
     catch {
         $Response = Get-ErrorResponsePayload -ErrorObject $_ | ConvertFrom-Json

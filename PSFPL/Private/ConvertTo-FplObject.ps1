@@ -9,7 +9,7 @@ function ConvertTo-FplObject {
     .PARAMETER Type
         The type name to give the resulted PowerShell object
     .EXAMPLE
-        $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/elements/' -UseBasicParsing
+        $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/elements/' -UseBasicParsing
         ConvertTo-FplObject -InputObject $Response -Type 'FplPlayer'
     .LINK
         https://github.com/sk82jack/PSFPL/

@@ -23,7 +23,7 @@ function Get-FplLineup {
 
     $TeamId = $Script:FplSessionData['TeamID']
 
-    $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/drf/my-team/$TeamId/" -WebSession $FplSessionData['FplSession'] -UseBasicParsing
+    $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/api/my-team/$TeamId/" -WebSession $FplSessionData['FplSession'] -UseBasicParsing
 
     ConvertTo-FplObject -InputObject $Response.Picks -Type 'FplLineup'
 }

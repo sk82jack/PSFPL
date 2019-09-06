@@ -11,10 +11,17 @@ function Get-FplElementType {
     #>
     [CmdletBinding()]
     param ()
-    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/element-types/' -UseBasicParsing
-    $ElementHash = @{}
-    foreach ($Element in $Response) {
-        $ElementHash[$Element.id] = $Element.singular_name
+    $Hashtable = @{}
+    if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['ElementTypes'])) {
+        $Bootstrap = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/bootstrap-static/' -UseBasicParsing
+        $Script:FplSessionData = @{
+            ElementTypes = $Bootstrap.element_types
+            Clubs        = $Bootstrap.teams
+            Players      = $Bootstrap.elements
+        }
     }
-    $ElementHash
+    foreach ($Element in $Script:FplSessionData['ElementTypes']) {
+        $Hashtable[$Element.id] = $Element.singular_name
+    }
+    $Hashtable
 }

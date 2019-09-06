@@ -35,27 +35,28 @@ function Connect-Fpl {
     }
 
     $Uri = 'https://users.premierleague.com/accounts/login/'
-    $LoginResponse = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -UseBasicParsing
-    $CsrfMiddlewareToken = $LoginResponse.InputFields.Where{$_.name -eq 'csrfmiddlewaretoken'}.value
-
-    $Response = Invoke-WebRequest -Uri $Uri -WebSession $FplSession -Method 'Post' -UseBasicParsing -Body @{
-        'csrfmiddlewaretoken' = $CsrfMiddlewareToken
-        'login'               = $Credential.UserName
-        'password'            = $Credential.GetNetworkCredential().Password
-        'app'                 = 'plfpl-web'
-        'redirect_uri'        = 'https://fantasy.premierleague.com/a/login'
+    $null = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -Method 'Post' -UseBasicParsing -Body @{
+        'login'        = $Credential.UserName
+        'password'     = $Credential.GetNetworkCredential().Password
+        'app'          = 'plfpl-web'
+        'redirect_uri' = 'https://fantasy.premierleague.com/a/login'
     }
 
-    if (-not ($Response.Headers.'Set-Cookie' -match 'sessionid=')) {
+    $ManagerInfo = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/me/' -UseBasicParsing -WebSession $FplSession
+
+    if (-not ($ManagerInfo.player)) {
         Throw 'Invalid credentials'
     }
 
-    $TeamInfo = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/transfers' -UseBasicParsing -WebSession $FplSession
+    $Bootstrap = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/bootstrap-static/' -UseBasicParsing -WebSession $FplSession
+    $TeamInfo = Invoke-RestMethod -Uri ('https://fantasy.premierleague.com/api/entry/{0}/' -f $ManagerInfo.player.entry) -UseBasicParsing -WebSession $FplSession
 
     $Script:FplSessionData = @{
-        FplSession = $FplSession
-        CsrfToken  = $Response.Headers.'Set-Cookie' -join ',' -replace '.*csrftoken=(.*?);.*', '$1'
-        TeamID     = $TeamInfo.entry.id
-        CurrentGW  = $TeamInfo.ce
+        FplSession   = $FplSession
+        TeamID       = $ManagerInfo.player.entry
+        CurrentGW    = [int]$TeamInfo.current_event
+        ElementTypes = $Bootstrap.element_types
+        Clubs        = $Bootstrap.teams
+        Players      = $Bootstrap.elements
     }
 }
