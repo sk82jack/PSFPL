@@ -87,7 +87,6 @@ function Invoke-FplTransfer {
 
         [Parameter()]
         [ValidateSet('WildCard', 'FreeHit')]
-        [string]
         $ActivateChip,
 
         [Parameter()]
@@ -96,7 +95,7 @@ function Invoke-FplTransfer {
     )
 
     if ($PlayersIn.Count -ne $PlayersOut.Count) {
-        Write-Error 'You must provide the same number of players coming into the starting lineup as there are players going out.' -ErrorAction 'Stop'
+        Write-Error 'You must provide the same number of players coming into the squad as there are players going out.' -ErrorAction 'Stop'
     }
 
     if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['FplSession'])) {
@@ -105,7 +104,7 @@ function Invoke-FplTransfer {
         Connect-Fpl -Credential $Credential
     }
 
-    $AllPlayers = Get-FplPlayer
+    $AllPlayers = ConvertTo-FplObject -InputObject $Script:FplSessionData['Players'] -Type 'FplPlayer'
     $Lineup = Get-FplLineup
 
     $InPlayers = Find-FplPlayer -PlayerTransform $PlayersIn -FplPlayerCollection $AllPlayers
@@ -117,13 +116,54 @@ function Invoke-FplTransfer {
     }
     $OutPlayers = Find-FplPlayer -PlayerTransform $PlayersOut -FplPlayerCollection $Lineup
 
+    $TransfersInfo = Get-FplTransfersInfo
+    Assert-FplBankCheck -PlayersIn $InPlayers -PlayersOut $OutPlayers -Bank $TransfersInfo.bank
+
+    if ($TransfersInfo.status -eq 'unlimited') {
+        $SpentPoints = 0
+    }
+    else {
+        $TransfersOverLimit = $OutPlayers.Count - $TransfersInfo.limit
+        if ($TransfersOverLimit -gt 0) {
+            $SpentPoints = $TransfersOverLimit * $TransfersInfo.cost
+        }
+        else {
+            $SpentPoints = 0
+        }
+    }
+
+    if (-not $Force) {
+        Write-Host -Object ('PlayersIn        : {0}' -f ($InPlayers.Name -join ', '))
+        Write-Host -Object ('PlayersOut       : {0}' -f ($OutPlayers.Name -join ', '))
+        $WriteHostSplat = @{
+            Object = 'PointsHit        : {0}' -f $SpentPoints
+        }
+        if ($SpentPoints -gt 0) {
+            $WriteHostSplat['ForeGroundColor'] = 'Red'
+        }
+        Write-Host @WriteHostSplat
+        if ($ActivateChip) {
+            Write-Host -Object ('Chip : {0}' -f $ActivateChip)
+        }
+
+        $PromptParams = @{
+            Title      = 'Confirm Transfers'
+            Message    = 'Are you sure you wish to make the transfer(s) listed above?'
+            YesMessage = 'Confirm transfers'
+            NoMessage  = 'Change transfers'
+        }
+        $Answer = Read-FplYesNoPrompt @PromptParams
+
+        if ($Answer -eq 1) {
+            return
+        }
+    }
+
     $Body = @{
-        confirmed = $false
-        entry     = $FplSessionData['TeamID']
-        event     = $FplSessionData['CurrentGW'] + 1
+        chip      = $ActivateChip
+        entry     = $Script:FplSessionData['TeamID']
+        event     = $Script:FplSessionData['CurrentGW'] + 1
         transfers = [System.Collections.Generic.List[Hashtable]]::new()
-        wildcard  = $ActivateChip -eq 'WildCard'
-        freehit   = $ActivateChip -eq 'FreeHit'
     }
 
     foreach ($Index in 0..(@($InPlayers).Count - 1)) {
@@ -148,7 +188,6 @@ function Invoke-FplTransfer {
             'Referer'      = 'https://fantasy.premierleague.com/transfers'
         }
     }
-
     try {
         $Response = Invoke-RestMethod @Params -ErrorAction 'Stop'
     }
@@ -156,34 +195,4 @@ function Invoke-FplTransfer {
         $Response = Get-ErrorResponsePayload -ErrorObject $_ | ConvertFrom-Json
         Write-FplError -FplError $Response
     }
-
-    if (-not $Force) {
-        Write-Host -Object ('PlayersIn        : {0}' -f ($InPlayers.Name -join ', '))
-        Write-Host -Object ('PlayersOut       : {0}' -f ($OutPlayers.Name -join ', '))
-        $WriteHostSplat = @{
-            Object = 'PointsHit        : {0}' -f $ConfirmationResponse.spent_points
-        }
-        if ($ConfirmationResponse.spent_points -gt 0) {
-            $WriteHostSplat['ForeGroundColor'] = 'Red'
-        }
-        Write-Host @WriteHostSplat
-        Write-Host -Object ('ActivateWildCard : {0}' -f $ConfirmationResponse.wildcard)
-        Write-Host -Object ('ActivateFreeHit  : {0}' -f $ConfirmationResponse.freehit)
-
-        $PromptParams = @{
-            Title      = 'Confirm Transfers'
-            Message    = 'Are you sure you wish to make the transfer(s) listed above?'
-            YesMessage = 'Confirm transfers'
-            NoMessage  = 'Change transfers'
-        }
-        $Answer = Read-FplYesNoPrompt @PromptParams
-
-        if ($Answer -eq 1) {
-            return
-        }
-    }
-
-    $Body['confirmed'] = $true
-    $Params['Body'] = ($Body | ConvertTo-Json)
-    Invoke-RestMethod @Params
 }
