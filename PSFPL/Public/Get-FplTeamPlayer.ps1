@@ -52,7 +52,7 @@ function Get-FplTeamPlayer {
             [int]$CurrentGameweek = $Script:FplSessionData['CurrentGW']
         }
         else {
-            [int]$CurrentGameweek = Get-FplGameweek -Current
+            [int]$CurrentGameweek = (Get-FplGameweek -Current).Gameweek
         }
 
         if (($CurrentGameweek -eq 0) -or ($Gameweek -gt $CurrentGameweek)) {
