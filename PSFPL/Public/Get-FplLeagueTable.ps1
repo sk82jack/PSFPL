@@ -48,7 +48,13 @@ function Get-FplLeagueTable {
         [PSTypeName('FplLeague')]
         $League
     )
-
+    begin {
+        if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['FplSession'])) {
+            Write-Warning 'You must be logged in to view leagues'
+            $Credential = Get-Credential -Message 'Please enter your FPL login details'
+            Connect-Fpl -Credential $Credential
+        }
+    }
     process {
         if ($PSCmdlet.ParameterSetName -eq 'PipelineInput') {
             $Type = $League.Scoring
