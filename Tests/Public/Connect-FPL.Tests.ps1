@@ -6,44 +6,22 @@ InModuleScope 'PSFPL' {
             $GoodCreds = [Management.Automation.PSCredential]::new("GoodUserName", $Password)
             $BadCreds = [Management.Automation.PSCredential]::new("BadUserName", $Password)
 
+            Mock Write-Warning {}
+
             Mock Invoke-WebRequest -ParameterFilter {$SessionVariable -eq 'FplSession'} {
-                [PSCustomObject]@{
-                    InputFields = @(
-                        [pscustomobject]@{
-                            name  = 'csrfmiddlewaretoken'
-                            value = 'csrfmiddlewaretoken'
-                        }
-                    )
-                }
-                $Script:FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
-            }
-
-            Mock Invoke-WebRequest -ParameterFilter {$Body -and $Body['login'] -eq 'BadUserName'} {
-                [PSCustomObject]@{
-                    Headers = @{
-                        'Set-Cookie' = $false
-                    }
+                $Password = $Body['password'] | ConvertTo-SecureString -AsPlainText -Force
+                $Credential = [pscredential]::new($Body['login'], $Password)
+                $Script:FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]@{
+                    Credentials = $Credential
                 }
             }
 
-            Mock Invoke-WebRequest -ParameterFilter {$Body -and $Body['login'] -eq 'GoodUserName'} {
-                $String = 'csrftoken=gLQjahvAQrHPKMAaCru1MZiSSkwRbbNN; expires=Wed, 25-Dec-2019 14:21:20 GMT; ' +
-                'Max-Age=31449600; Path=/sessionid=".eJyrVkpPzE2NT85PSVWyUirISSvIUdJRik8sLcmILy1OLYpPSkzOTs1L' +
-                'AUsmVqYW6UEFivUCwHwnqDyKpkyg-mhDHXNTM0szI_PYWgBVsyN-:1gcA3k:qSFMS32dMMJ6mC29t3zXnrCTzgA"; ' +
-                'httponly; Path=/affiliate=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/' +
-                'one-click-join=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'
-                [PSCustomObject]@{
-                    Headers = @{
-                        'Set-Cookie' = $String
-                    }
-                }
-            }
+            Mock Invoke-RestMethod -ParameterFilter {$WebSession -and $WebSession.Credentials.UserName -eq 'BadUserName'} {}
 
             Mock Invoke-RestMethod {
                 [PSCustomObject]@{
-                    ce    = 27
-                    entry = [PSCustomObject]@{
-                        id = 12345
+                    player = [PSCustomObject]@{
+                        entry = 12345
                     }
                 }
             }
@@ -62,13 +40,15 @@ InModuleScope 'PSFPL' {
             }
             It "doesn't connect if an existing connection exists" {
                 Connect-FPL -Credential $GoodCreds
-                $Response = Connect-FPL -Credential $GoodCreds 3>&1
-                $Response.Message | Should -Be 'A connection already exists. Use the Force parameter to connect.'
+                Connect-FPL -Credential $GoodCreds
+                $ExpectedMessage = 'A connection already exists. Use the Force parameter to connect.'
+                Assert-MockCalled Write-Warning -ParameterFilter {$Message -eq $ExpectedMessage} -Scope 'It'
             }
             It "connects if an existing connection exists but we use the force parameter" {
                 Connect-FPL -Credential $GoodCreds
-                $Response = Connect-FPL -Credential $GoodCreds -Force 3>&1
-                $Response.Message | Should -BeNullOrEmpty
+                Connect-FPL -Credential $GoodCreds -Force
+                $ExpectedMessage = 'A connection already exists. Use the Force parameter to connect.'
+                Assert-MockCalled Write-Warning -ParameterFilter {$Message -eq $ExpectedMessage} -Scope 'It' -Exactly 0
             }
         }
         Context 'Output' {
@@ -76,9 +56,7 @@ InModuleScope 'PSFPL' {
                 Connect-FPL -Credential $GoodCreds
                 $FplSessionData | Should -Not -BeNullOrEmpty
                 $FplSessionData['FplSession'] | Should -BeOfType 'Microsoft.PowerShell.Commands.WebRequestSession'
-                $FplSessionData['CsrfToken'] | Should -Be 'gLQjahvAQrHPKMAaCru1MZiSSkwRbbNN'
                 $FplSessionData['TeamID'] | Should -Be 12345
-                $FplSessionData['CurrentGW'] | Should -Be 27
             }
         }
         AfterEach {
