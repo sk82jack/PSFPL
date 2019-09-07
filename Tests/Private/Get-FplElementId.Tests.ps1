@@ -3,10 +3,12 @@ InModuleScope 'PSFPL' {
     Describe 'Get-FplElementId' {
         BeforeAll {
             Mock Invoke-RestMethod {
-                @(
-                    [pscustomobject]@{id = 1; web_name = 'Cech'},
-                    [pscustomobject]@{id = 2; web_name = 'BellerÃ­n'}
-                )
+                [PSCustomObject]@{
+                    elements = @(
+                        [pscustomobject]@{id = 1; web_name = 'Cech'},
+                        [pscustomobject]@{id = 2; web_name = 'BellerÃ­n'}
+                    )
+                }
             }
             $Result = Get-FplElementId
         }
