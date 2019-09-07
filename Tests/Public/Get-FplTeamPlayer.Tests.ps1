@@ -8,11 +8,19 @@ InModuleScope 'PSFPL' {
                 }
             }
             Mock ConvertTo-FplObject {}
+            Mock Get-FplGameweek {
+                [PSCustomObject]@{
+                    Gameweek = 1
+                }
+            }
+            Mock Write-Warning {}
         }
         Context 'TeamId and Gameweek supplied' {
             It 'passes the TeamId onto Invoke-RestMethod' {
-                $Results = Get-FplTeamPlayer -TeamId 123456 -Gameweek 13
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456/event/13/picks'} -Scope 'It'
+                Get-FplTeamPlayer -TeamId 123456 -Gameweek 13
+                Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/123456/event/13/picks/'
+                }
             }
         }
         Context 'No TeamID whilst not logged in' {
@@ -24,7 +32,6 @@ InModuleScope 'PSFPL' {
                 Mock Connect-Fpl {
                     $Script:FplSessionData = @{
                         FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
-                        CsrfToken  = 'csrftoken'
                         TeamID     = 12345
                     }
                 }
@@ -33,11 +40,13 @@ InModuleScope 'PSFPL' {
                 Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
             It 'returns a warning' {
-                $Result = Get-FplTeamPlayer -Gameweek 14 3>&1
-                $Result.Message | Should -Contain 'No existing connection found'
+                Get-FplTeamPlayer -Gameweek 14
+                Assert-MockCalled Write-Warning -Scope 'It' -ParameterFilter {
+                    $Message -eq 'No existing connection found'
+                }
             }
             It "connects to the FPL API" {
-                $Result = Get-FplTeamPlayer -Gameweek 14 -WarningAction SilentlyContinue
+                Get-FplTeamPlayer -Gameweek 14
                 Assert-MockCalled Connect-Fpl -Scope 'It'
             }
         }
@@ -45,7 +54,6 @@ InModuleScope 'PSFPL' {
             BeforeAll {
                 $Script:FplSessionData = @{
                     FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
-                    CsrfToken  = 'csrftoken'
                     TeamID     = 12345
                 }
             }
@@ -53,9 +61,9 @@ InModuleScope 'PSFPL' {
                 Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
             It 'calls Get-FplUserTeam when no parameter is given' {
-                $Results = Get-FplTeamPlayer -Gameweek 13
+                Get-FplTeamPlayer -Gameweek 13
                 Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/12345/event/13/picks'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/12345/event/13/picks'
                 }
             }
         }
@@ -71,16 +79,16 @@ InModuleScope 'PSFPL' {
                 Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
             It 'calls Get-FplGameweek when no parameter is given and the user has not authenticated' {
-                $Result = Get-FplTeamPlayer -TeamId 123456
+                Get-FplTeamPlayer -TeamId 123456
                 Assert-MockCalled Get-FplGameweek -Scope 'It'
             }
             It 'gets the current gameweek from the FplSessionData variable when authenticated' {
                 $Script:FplSessionData = @{
                     CurrentGW = 27
                 }
-                $Result = Get-FplTeamPlayer -TeamId 123456
+                Get-FplTeamPlayer -TeamId 123456
                 Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456/event/27/picks'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/123456/event/27/picks/'
                 }
             }
         }
