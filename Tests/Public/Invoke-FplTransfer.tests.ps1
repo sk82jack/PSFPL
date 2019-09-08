@@ -43,19 +43,34 @@ InModuleScope 'PSFPL' {
                     FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
                     TeamID     = 12345
                     CurrentGW  = 33
+                    Players    = $true
                 }
             }
+            Mock ConvertTo-FplObject {$Hazard, $Robertson, $Sterling, $Son}
             Mock Get-FplPlayer {}
             Mock Get-FplLineup {$Sterling, $Son}
             Mock Find-FplPlayer {
-                $PlayerTransform
+                , $PlayerTransform
             }
+            Mock Get-FplTransfersInfo {
+                @{
+                    cost   = 4
+                    status = 'cost'
+                    limit  = 2
+                    made   = 0
+                    bank   = 1
+                    value  = 1004
+                }
+            }
+            Mock Assert-FplBankCheck {}
             Mock Invoke-RestMethod {}
             Mock Write-Host {}
             Mock Read-FplYesNoPrompt {0}
+            Mock Get-ErrorResponsePayload {}
+            Mock Write-FplError {throw 'Mocked error'}
         }
         It 'throws if you provide a different number of players in/out' {
-            $ExpectedMessage = 'You must provide the same number of players coming into the starting lineup as there are players going out.'
+            $ExpectedMessage = 'You must provide the same number of players coming into the squad as there are players going out.'
             {Invoke-FplTransfer -PlayersIn $Hazard, $Robertson -PlayersOut $Sterling} | Should -Throw -ExpectedMessage $ExpectedMessage
         }
         It 'authenticates if not already authenticated' {
@@ -68,6 +83,7 @@ InModuleScope 'PSFPL' {
                 FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
                 TeamID     = 12345
                 CurrentGW  = 33
+                Players    = $true
             }
             Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -Force
             Assert-MockCalled Connect-Fpl -Times 0 -Scope 'It'
@@ -81,8 +97,7 @@ InModuleScope 'PSFPL' {
             Assert-MockCalled Invoke-RestMethod -Times 1 -Scope 'It' -ParameterFilter {
                 $Body -eq @'
 {
-    "confirmed":  false,
-    "freehit":  false,
+    "chip":  null,
     "transfers":  [
                       {
                           "selling_price":  112,
@@ -91,9 +106,8 @@ InModuleScope 'PSFPL' {
                           "purchase_price":  111
                       }
                   ],
-    "wildcard":  false,
-    "event":  34,
-    "entry":  12345
+    "entry":  12345,
+    "event":  34
 }
 '@
             }
@@ -103,8 +117,7 @@ InModuleScope 'PSFPL' {
             Assert-MockCalled Invoke-RestMethod -Times 1 -Scope 'It' -ParameterFilter {
                 $Body -eq @'
 {
-    "confirmed":  false,
-    "freehit":  false,
+    "chip":  null,
     "transfers":  [
                       {
                           "selling_price":  112,
@@ -119,34 +132,33 @@ InModuleScope 'PSFPL' {
                           "purchase_price":  68
                       }
                   ],
-    "wildcard":  false,
-    "event":  34,
-    "entry":  12345
+    "entry":  12345,
+    "event":  34
 }
 '@
             }
         }
         It 'processes a wildcard activation properly' {
-            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -ActivateChip 'WildCard' -Force
-            Assert-MockCalled Invoke-RestMethod -Times 1 -Scope 'It' -ParameterFilter {
-                ($Body | ConvertFrom-Json).wildcard -eq $true
+            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -ActivateChip 'WildCard'
+            Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
+                ($Body | ConvertFrom-Json).chip -eq 'Wildcard'
+            }
+            Assert-MockCalled Write-Host -Scope 'It' -ParameterFilter {
+                $Object -eq 'Chip       : Wildcard'
             }
         }
         It 'processes a freehit activation properly' {
-            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -ActivateChip 'FreeHit' -Force
-            Assert-MockCalled Invoke-RestMethod -Times 1 -Scope 'It' -ParameterFilter {
-                ($Body | ConvertFrom-Json).freehit -eq $true
+            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -ActivateChip 'FreeHit'
+            Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
+                ($Body | ConvertFrom-Json).chip -eq 'FreeHit'
             }
-        }
-        It 'resends the body with confirmation' {
-            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -Force
-            Assert-MockCalled Invoke-RestMethod -Times 1 -Scope 'It' -ParameterFilter {
-                ($Body | ConvertFrom-Json).confirmed -eq $true
+            Assert-MockCalled Write-Host -Scope 'It' -ParameterFilter {
+                $Object -eq 'Chip       : FreeHit'
             }
         }
         It 'outputs confirmation to the host if not using force' {
             Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
-            Assert-MockCalled Write-Host -Exactly 5 -Scope 'It'
+            Assert-MockCalled Write-Host -Exactly 3 -Scope 'It'
         }
         It 'exits early if you answer no to the confirmation prompt' {
             Mock Read-FplYesNoPrompt {1}
@@ -155,17 +167,42 @@ InModuleScope 'PSFPL' {
                 ($Body | ConvertFrom-Json).confirmed -eq $true
             }
         }
-        It 'catches an API error and throws a PSFPL error' {
-            Mock Invoke-RestMethod {throw} -ParameterFilter {
-                ($Body | ConvertFrom-Json).confirmed -eq $false
+        It 'calculates the points spent' {
+            Mock Get-FplTransfersInfo {
+                @{
+                    cost   = 4
+                    status = 'cost'
+                    limit  = 0
+                    made   = 2
+                    bank   = 1
+                    value  = 1004
+                }
             }
-            Mock Get-ErrorResponsePayload {}
-            Mock Write-FplError {throw 'Mocked error'}
+            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
+            Assert-MockCalled Write-Host -Scope 'It' -ParameterFilter {
+                $Object -eq 'PointsHit        : 4' -and
+                $ForeGroundColor -eq 'Red'
+            }
 
-            {Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -Force} | Should -Throw -ExpectedMessage 'Mocked error'
-            Assert-MockCalled Invoke-RestMethod -Times 1 -Scope 'It' -ParameterFilter {
-                ($Body | ConvertFrom-Json).confirmed -eq $false
+            Mock Get-FplTransfersInfo {
+                @{
+                    cost   = 4
+                    status = 'unlimited'
+                    limit  = 0
+                    made   = 2
+                    bank   = 1
+                    value  = 1004
+                }
             }
+            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
+            Assert-MockCalled Write-Host -Scope 'It' -ParameterFilter {
+                $Object -eq 'PointsHit        : 0'
+            }
+        }
+        It 'catches an API error and throws a PSFPL error' {
+            Mock Invoke-RestMethod {throw}
+            {Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling -Force} | Should -Throw -ExpectedMessage 'Mocked error'
+            Assert-MockCalled Invoke-RestMethod -Times 1 -Scope 'It'
             Assert-MockCalled Get-ErrorResponsePayload -Times 1 -Scope 'It'
             Assert-MockCalled Write-FplError -Times 1 -Scope 'It'
         }
