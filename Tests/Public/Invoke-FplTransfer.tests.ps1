@@ -63,6 +63,7 @@ InModuleScope 'PSFPL' {
                 }
             }
             Mock Assert-FplBankCheck {}
+            Mock Get-FplSpentPoints {0}
             Mock Invoke-RestMethod {}
             Mock Write-Host {}
             Mock Read-FplYesNoPrompt {0}
@@ -156,6 +157,14 @@ InModuleScope 'PSFPL' {
                 $Object -eq 'Chip       : FreeHit'
             }
         }
+        It 'changes the output colour if taking a points hit' {
+            Mock Get-FplSpentPoints {4}
+            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
+            Assert-MockCalled Write-Host -Scope 'It' -ParameterFilter {
+                $Object -eq 'PointsHit        : 4' -and
+                $ForeGroundColor -eq 'Red'
+            }
+        }
         It 'outputs confirmation to the host if not using force' {
             Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
             Assert-MockCalled Write-Host -Exactly 3 -Scope 'It'
@@ -165,38 +174,6 @@ InModuleScope 'PSFPL' {
             Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
             Assert-MockCalled Invoke-RestMethod -Times 0 -Scope 'It' -ParameterFilter {
                 ($Body | ConvertFrom-Json).confirmed -eq $true
-            }
-        }
-        It 'calculates the points spent' {
-            Mock Get-FplTransfersInfo {
-                @{
-                    cost   = 4
-                    status = 'cost'
-                    limit  = 0
-                    made   = 2
-                    bank   = 1
-                    value  = 1004
-                }
-            }
-            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
-            Assert-MockCalled Write-Host -Scope 'It' -ParameterFilter {
-                $Object -eq 'PointsHit        : 4' -and
-                $ForeGroundColor -eq 'Red'
-            }
-
-            Mock Get-FplTransfersInfo {
-                @{
-                    cost   = 4
-                    status = 'unlimited'
-                    limit  = 0
-                    made   = 2
-                    bank   = 1
-                    value  = 1004
-                }
-            }
-            Invoke-FplTransfer -PlayersIn $Hazard -PlayersOut $Sterling
-            Assert-MockCalled Write-Host -Scope 'It' -ParameterFilter {
-                $Object -eq 'PointsHit        : 0'
             }
         }
         It 'catches an API error and throws a PSFPL error' {
