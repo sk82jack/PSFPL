@@ -52,6 +52,33 @@ InModuleScope 'PSFPL' {
                     id                  = 1
                     deadline_time       = '08/10/2018 18:00:00'
                     average_entry_score = 53
+                    chip_plays          = @(
+                        [PSCustomObject]@{
+                            chip_name  = 'bboost'
+                            num_played = 1
+                        }
+                        [PSCustomObject]@{
+                            chip_name  = '3xc'
+                            num_played = 2
+                        }
+                    )
+                    MostSelected        = 1
+                    MostTransferredIn   = 2
+                    TopElement          = 3
+                    MostCaptained       = 4
+                    MostViceCaptained   = 5
+                    TopElementInfo      = [PSCustomObject]@{
+                        points = 5
+                    }
+                }
+                Mock Get-FplElementId {
+                    @{
+                        1 = 'Sterling'
+                        2 = 'Puuki'
+                        3 = 'Salah'
+                        4 = 'Aguero'
+                        5 = 'Mane'
+                    }
                 }
                 $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplGameweek'
             }
@@ -67,6 +94,22 @@ InModuleScope 'PSFPL' {
             It 'renames the Id property to Gameweek' {
                 $Result.Id | Should -BeNullOrEmpty
                 $Result.Gameweek | Should -BeExactly 1
+            }
+            It 'sets the BenchBoostPlays property' {
+                $Result.BenchBoostPlays | Should -Be 1
+            }
+            It 'sets the TripleCaptainPlays property' {
+                $Result.TripleCaptainPlays | Should -Be 2
+            }
+            It 'converts player ID properties to player names' {
+                $Result.MostSelected | Should -Be 'Sterling'
+                $Result.MostTransferredIn | Should -Be 'Puuki'
+                $Result.TopElement | Should -Be 'Salah'
+                $Result.MostCaptained | Should -Be 'Aguero'
+                $Result.MostViceCaptained | Should -Be 'Mane'
+            }
+            It 'sets the TopElementPoints property' {
+                $Result.TopElementPoints | Should -Be 5
             }
         }
         Context 'FplFixture type' {
@@ -207,24 +250,24 @@ InModuleScope 'PSFPL' {
                     [PSCustomObject]@{
                         league    = [PSCustomObject]@{
                             name = 'MyCustomLeague'
+                            id   = 12345
                         }
                         standings = [PSCustomObject]@{
                             has_next = $false
                             results  = [PSCustomObject]@{
-                                league = 12345
-                                entry  = 54321
+                                entry = 54321
                             }
                         }
                     },
                     [PSCustomObject]@{
                         league    = [PSCustomObject]@{
                             name = 'MyCustomLeague'
+                            id   = 12345
                         }
                         standings = [PSCustomObject]@{
                             has_next = $false
                             results  = [PSCustomObject]@{
-                                league = 12345
-                                entry  = 65432
+                                entry = 65432
                             }
                         }
                     }
@@ -235,8 +278,7 @@ InModuleScope 'PSFPL' {
             It 'adds the LeagueName property' {
                 $Results | ForEach-Object {$_.LeagueName | Should -Be 'MyCustomLeague'}
             }
-            It 'renames the League property to LeagueId' {
-                $Results | ForEach-Object {$_.League | Should -BeNullOrEmpty}
+            It 'adds the LeagueId property' {
                 $Results.LeagueId | Should -Contain 12345
             }
             It 'renames the Team property to TeamId' {
@@ -252,19 +294,19 @@ InModuleScope 'PSFPL' {
                     }
                 }
                 $Object = [PSCustomObject]@{
-                    bank          = 13
-                    value         = 1013
-                    favouriteteam = 6
-                    id            = 123456
-                    player        = 987654321
+                    last_deadline_bank  = 13
+                    last_deadline_value = 1013
+                    favouriteteam       = 6
+                    id                  = 123456
+                    joined_time         = '2919-09-08T19:27:35'
                 }
                 $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplTeam'
             }
-            It 'divides the bank property by 10' {
-                $Result.Bank | Should -Be 1.3
+            It 'divides the LastDeadlineBank property by 10' {
+                $Result.LastDeadlineBank | Should -Be 1.3
             }
-            It 'divides the value property by 10' {
-                $Result.Value | Should -Be 101.3
+            It 'divides the LastDeadlineValue property by 10' {
+                $Result.LastDeadlineValue | Should -Be 101.3
             }
             It 'replaces favourite team ID with name' {
                 $Result.FavouriteClub | Should -Be 'Chelsea'
@@ -273,9 +315,8 @@ InModuleScope 'PSFPL' {
                 $Result.Id | Should -BeNullOrEmpty
                 $Result.TeamId | Should -Be 123456
             }
-            It 'renames the Player property to PlayerId' {
-                $Result.Player | Should -BeNullOrEmpty
-                $Result.PlayerId | Should -Be 987654321
+            It 'converts the JoinedTime property to a datetime object' {
+                $Result.JoinedTime | Should -BeOfType [datetime]
             }
         }
         Context 'FplLeague' {
@@ -286,23 +327,27 @@ InModuleScope 'PSFPL' {
                         league_type = 'c'
                         _scoring    = 'c'
                         id          = 1
+                        created     = '2919-09-08T19:27:35'
                     }
                     h2h     = @(
                         [PSCustomObject]@{
-                            Name = 'cup'
-                            id   = 2
+                            Name    = 'cup'
+                            id      = 2
+                            created = '2919-09-08T19:27:35'
                         },
                         [PSCustomObject]@{
                             Name        = 'H2H League'
                             league_type = 's'
                             _scoring    = 'h'
                             id          = 3
+                            created     = '2919-09-08T19:27:35'
                         },
                         [PSCustomObject]@{
                             Name        = 'Classic League 2'
                             league_type = 'x'
                             _scoring    = 'c'
                             id          = 4
+                            created     = '2919-09-08T19:27:35'
                         }
                     )
                 }
@@ -325,24 +370,39 @@ InModuleScope 'PSFPL' {
                 $Result.foreach{$_.Id | Should -BeNullOrEmpty}
                 $Result.LeagueId | Should -Be 1, 3, 4
             }
+            It 'converts the Created property to a datetime object' {
+                $Result.foreach{$_.Created | Should -BeOfType [datetime]}
+            }
         }
         Context 'FplTeamPlayer' {
             BeforeAll {
-                Mock Get-FplPlayer {
-                    [PSCustomObject]@{
-                        Name           = 'Hazard'
-                        PlayerId       = 122
-                        Club           = 'Chelsea'
-                        Position       = 'Midfielder'
-                        GameweekPoints = 8
-                    },
-                    [PSCustomObject]@{
-                        Name           = 'Alonso'
-                        PlayerId       = 115
-                        Club           = 'Chelsea'
-                        Position       = 'Defender'
-                        GameweekPoints = 2
-                    }
+                $Script:FplSessionData = @{
+                    Players = @(
+                        [PSCustomObject]@{
+                            id = 122
+                        }
+                        [PSCustomObject]@{
+                            id = 115
+                        }
+                    )
+                }
+                Mock ConvertTo-FplObject -ParameterFilter {$Type -eq 'FplPlayer'} {
+                    @(
+                        [PSCustomObject]@{
+                            Name           = 'Hazard'
+                            PlayerId       = 122
+                            Club           = 'Chelsea'
+                            Position       = 'Midfielder'
+                            GameweekPoints = 8
+                        }
+                        [PSCustomObject]@{
+                            Name           = 'Alonso'
+                            PlayerId       = 115
+                            Club           = 'Chelsea'
+                            Position       = 'Defender'
+                            GameweekPoints = 2
+                        }
+                    )
                 }
 
                 $Object = [PSCustomObject]@{
@@ -351,6 +411,7 @@ InModuleScope 'PSFPL' {
                     is_captain      = $true
                     is_vice_captain = $false
                     multiplier      = 2
+                    news_added      = '2019-09-08T19:27:35'
                 },
                 [PSCustomObject]@{
                     element         = 115
@@ -358,6 +419,7 @@ InModuleScope 'PSFPL' {
                     is_captain      = $false
                     is_vice_captain = $false
                     multiplier      = 1
+                    news_added      = '2019-09-08T19:27:35'
                 }
 
                 $Result = ConvertTo-FplObject -InputObject $Object -Type 'FplTeamPlayer'
@@ -381,24 +443,39 @@ InModuleScope 'PSFPL' {
             It 'calculates captain points for only the captain' {
                 $Result.Points | Should -Be 16, 2
             }
+            It 'converts the NewsAdded property to a datetime object' {
+                $Result.NewsAdded | Foreach-Object {$_ | Should -BeOfType [datetime]}
+            }
         }
         Context 'FplLineup' {
             BeforeAll {
-                Mock Get-FplPlayer {
-                    [PSCustomObject]@{
-                        Name           = 'Hazard'
-                        PlayerId       = 122
-                        Club           = 'Chelsea'
-                        Position       = 'Midfielder'
-                        GameweekPoints = 8
-                    },
-                    [PSCustomObject]@{
-                        Name           = 'Alonso'
-                        PlayerId       = 115
-                        Club           = 'Chelsea'
-                        Position       = 'Defender'
-                        GameweekPoints = 2
-                    }
+                $Script:FplSessionData = @{
+                    Players = @(
+                        [PSCustomObject]@{
+                            id = 122
+                        }
+                        [PSCustomObject]@{
+                            id = 115
+                        }
+                    )
+                }
+                Mock ConvertTo-FplObject -ParameterFilter {$Type -eq 'FplPlayer'} {
+                    @(
+                        [PSCustomObject]@{
+                            Name           = 'Hazard'
+                            PlayerId       = 122
+                            Club           = 'Chelsea'
+                            Position       = 'Midfielder'
+                            GameweekPoints = 8
+                        }
+                        [PSCustomObject]@{
+                            Name           = 'Alonso'
+                            PlayerId       = 115
+                            Club           = 'Chelsea'
+                            Position       = 'Defender'
+                            GameweekPoints = 2
+                        }
+                    )
                 }
 
                 $Object = [PSCustomObject]@{
