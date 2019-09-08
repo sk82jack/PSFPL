@@ -133,8 +133,8 @@ function Invoke-FplTransfer {
     }
 
     if (-not $Force) {
-        Write-Host -Object ('PlayersIn        : {0}' -f ($InPlayers.Name -join ', '))
-        Write-Host -Object ('PlayersOut       : {0}' -f ($OutPlayers.Name -join ', '))
+        Write-Host -Object ('PlayersIn  : {0}' -f ($InPlayers.Name -join ', '))
+        Write-Host -Object ('PlayersOut : {0}' -f ($OutPlayers.Name -join ', '))
         $WriteHostSplat = @{
             Object = 'PointsHit        : {0}' -f $SpentPoints
         }
@@ -143,7 +143,7 @@ function Invoke-FplTransfer {
         }
         Write-Host @WriteHostSplat
         if ($ActivateChip) {
-            Write-Host -Object ('Chip : {0}' -f $ActivateChip)
+            Write-Host -Object ('Chip       : {0}' -f $ActivateChip)
         }
 
         $PromptParams = @{
