@@ -56,8 +56,7 @@ function Get-FplTeamPlayer {
         }
 
         if (($CurrentGameweek -eq 0) -or ($Gameweek -gt $CurrentGameweek)) {
-            Write-Warning -Message 'Cannot view team because the gameweek has not started yet'
-            continue
+            Write-Error -Message 'Cannot view team because the gameweek has not started yet' -ErrorAction 'Stop'
         }
 
         if ($Gameweek -eq 0) {
@@ -68,8 +67,11 @@ function Get-FplTeamPlayer {
             $Response = Invoke-RestMethod -Uri "https://fantasy.premierleague.com/api/entry/$TeamId/event/$Gameweek/picks/"
         }
         catch {
-            if ($_.Exception.Response.StatusCode -eq 'NotFound') {
+            if ($_.ErrorDetails.Message -eq '{"detail":"Not found."}') {
                 Write-Error -Message "Team did not exist in gameweek $Gameweek" -ErrorAction 'Stop'
+            }
+            else {
+                Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
             }
         }
         if ($Response -match 'The game is being updated.') {
