@@ -34,7 +34,6 @@ function ConvertTo-FplObject {
             $TeamHash = Get-FplClubId
         }
         'FplGameweek' {
-            $TeamHash = Get-FplClubId
             $PlayerHash = Get-FplElementId
         }
         'FplFixture' {
@@ -148,7 +147,6 @@ function ConvertTo-FplObject {
             'FplLeagueTable' {
                 $Hashtable['LeagueName'] = $LeagueName
                 $Hashtable['LeagueId'] = $LeagueId
-                $Hashtable.Remove('League')
                 $Hashtable['TeamId'] = $Hashtable['Team']
                 $Hashtable.Remove('Team')
             }
