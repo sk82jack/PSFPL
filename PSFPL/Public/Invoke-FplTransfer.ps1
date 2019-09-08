@@ -118,19 +118,7 @@ function Invoke-FplTransfer {
 
     $TransfersInfo = Get-FplTransfersInfo
     Assert-FplBankCheck -PlayersIn $InPlayers -PlayersOut $OutPlayers -Bank $TransfersInfo.bank
-
-    if ($TransfersInfo.status -eq 'unlimited') {
-        $SpentPoints = 0
-    }
-    else {
-        $TransfersOverLimit = $OutPlayers.Count - $TransfersInfo.limit
-        if ($TransfersOverLimit -gt 0) {
-            $SpentPoints = $TransfersOverLimit * $TransfersInfo.cost
-        }
-        else {
-            $SpentPoints = 0
-        }
-    }
+    $SpentPoints = Get-FplSpentPoints -TransfersCount $InPlayers.Count -TransfersInfo $TransfersInfo
 
     if (-not $Force) {
         Write-Host -Object ('PlayersIn  : {0}' -f ($InPlayers.Name -join ', '))
