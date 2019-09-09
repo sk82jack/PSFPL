@@ -13,7 +13,7 @@ jobs:
       displayName: 'Test'
       inputs:
         targetType: 'filePath'
-        filePath: .\Build\Start-Build.ps1
+        filePath: ./Build/Start-Build.ps1
         arguments: -Task Test -Verbose
         errorActionPreference: 'stop'
         failOnStderr: true
@@ -26,12 +26,22 @@ jobs:
         testResultsFiles: '**/TestResults.xml'
         testRunTitle: 'PS_Win2016'
 
+    - task: reportgenerator@4
+      displayName: 'Generate Code Coverage Report'
+      condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      inputs:
+        reports: 'TestCoverage.xml'
+        reporttypes: 'HtmlInline_AzurePipelines'
+        sourcedirs: ./PSFPL/
+        targetdir: coveragereport
+
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish Code Coverage Results'
       condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       inputs:
         codeCoverageTool: 'JaCoCo'
         summaryFileLocation: '**/TestCoverage.xml'
+        reportDirectory: coveragereport
 
     - task: Powershell@2
       displayName: 'Set build version'
@@ -41,7 +51,7 @@ jobs:
         GITHUB_PAT: $(github.pat)
       inputs:
         targetType: 'filePath'
-        filePath: .\Build\Start-Build.ps1
+        filePath: ./Build/Start-Build.ps1
         arguments: -Task SetBuildVersion -Verbose
         errorActionPreference: 'stop'
         failOnStderr: true
@@ -54,7 +64,7 @@ jobs:
         PSREPO_APIKEY: $(psrepo.apikey)
       inputs:
         targetType: 'filePath'
-        filePath: .\Build\Start-Build.ps1
+        filePath: ./Build/Start-Build.ps1
         arguments: -Task Deploy -Verbose
         errorActionPreference: 'stop'
         failOnStderr: true
