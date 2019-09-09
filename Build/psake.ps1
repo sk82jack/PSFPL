@@ -12,10 +12,39 @@ Properties {
         $Verbose = @{Verbose = $True}
     }
 
-    git config --global user.email 'pipeline@example.com'
-    git config --global user.name 'pipeline'
+    $GitSettings = git config --list --show-origin
+    $GitName = ($GitSettings | Select-String -Pattern '^file:(.*?)\s+user\.name=(.*?)$').Matches.Groups
+    $GitEmail = ($GitSettings | Select-String -Pattern '^file:(.*?)\s+user\.email=(.*?)$').Matches.Groups
 }
 
+TaskSetup {
+    if ($GitEmail -and $GitEmail[1].Value) {
+        git config -f $GitEmail[1].Value user.email 'pipeline@example.com'
+    }
+    else {
+        git config --global user.email 'pipeline@example.com'
+    }
+    if ($GitName -and $GitName[1].Value) {
+        git config -f $GitName[1].Value user.name 'pipeline'
+    }
+    else {
+        git config --global user.name 'pipeline@example.com'
+    }
+}
+TaskTearDown {
+    if ($GitEmail -and $GitEmail[2].Value) {
+        git config -f $GitEmail[1].Value user.email $GitEmail[2].Value
+    }
+    else {
+        git config --global --unset user.email
+    }
+    if ($GitName -and $GitName[2].Value) {
+        git config -f $GitName[1].Value user.name $GitName[2].Value
+    }
+    else {
+        git config --global --unset user.name
+    }
+}
 Task Default -Depends Test
 
 Task Init {
@@ -171,10 +200,10 @@ Task BuildDocs -depends Build {
     }
 
     $Params = @{
-        Path = "$env:BHProjectPath\CHANGELOG.md"
+        Path           = "$env:BHProjectPath\CHANGELOG.md"
         ReleaseVersion = $ReleaseVersion.ToString()
-        LinkMode = 'Automatic'
-        LinkPattern   = @{
+        LinkMode       = 'Automatic'
+        LinkPattern    = @{
             FirstRelease  = "https://github.com/sk82jack/$ENV:BHProjectName/tree/v{CUR}"
             NormalRelease = "https://github.com/sk82jack/$ENV:BHProjectName/compare/v{PREV}..v{CUR}"
             Unreleased    = "https://github.com/sk82jack/$ENV:BHProjectName/compare/v{CUR}..HEAD"
@@ -191,9 +220,9 @@ Task TestAfterBuild -Depends BuildDocs {
 
     # Gather test results
     $Params = @{
-        Path                   = "$ENV:BHProjectPath\Tests"
-        Show                   = 'Fails'
-        PassThru               = $true
+        Path     = "$ENV:BHProjectPath\Tests"
+        Show     = 'Fails'
+        PassThru = $true
     }
     $TestResults = Invoke-Pester @Params
 
