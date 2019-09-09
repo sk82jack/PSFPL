@@ -87,7 +87,7 @@ Task Test -Depends Init {
     # Gather test results
     $TestFile = "TestResults.xml"
     $CoverageFile = "TestCoverage.xml"
-    $CodeFiles = (Get-ChildItem $ENV:BHModulePath -Recurse -Include "*.psm1", "*.ps1")
+    $CodeFiles = Get-ChildItem $ENV:BHModulePath -Recurse -Include "*.psm1", "*.ps1"
     $Params = @{
         Path                   = "$ENV:BHProjectPath\Tests"
         OutputFile             = "$ENV:BHProjectPath\$TestFile"
@@ -99,7 +99,7 @@ Task Test -Depends Init {
     }
     $TestResults = Invoke-Pester @Params
     [Net.ServicePointManager]::SecurityProtocol = $SecurityProtocol
-    $TestSourceDirs = ($CodeFiles.ParentDirectoryName | Sort-Object -Unique) -join ";"
+    $TestSourceDirs = ($CodeFiles.DirectoryName | Sort-Object -Unique) -join ";"
     Write-Host "INFO [task.setvariable variable=CodeCoverageDirectories]$TestSourceDirs"
     Write-Host "##vso[task.setvariable variable=CodeCoverageDirectories]$TestSourceDirs"
 
