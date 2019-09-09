@@ -32,7 +32,7 @@ jobs:
       inputs:
         reports: 'TestCoverage.xml'
         reporttypes: 'HtmlInline_AzurePipelines'
-        sourcedirs: ./PSFPL/
+        sourcedirs: $(CodeCoverageDirectories)
         targetdir: coveragereport
 
     - task: PublishCodeCoverageResults@1

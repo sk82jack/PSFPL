@@ -16,6 +16,6 @@
     'ChangelogManagement' = @{ DependencyType = 'PSGalleryNuget' }
     'Pester'              = @{
         DependencyType = 'PSGalleryNuget'
-        Version        = '4.4.2'
+        Version        = '4.9.0'
     }
 }

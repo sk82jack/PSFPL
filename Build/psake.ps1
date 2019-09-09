@@ -87,18 +87,20 @@ Task Test -Depends Init {
     # Gather test results
     $TestFile = "TestResults.xml"
     $CoverageFile = "TestCoverage.xml"
-    $CodeFiles = (Get-ChildItem $ENV:BHModulePath -Recurse -Include "*.psm1", "*.ps1").FullName
+    $CodeFiles = (Get-ChildItem $ENV:BHModulePath -Recurse -Include "*.psm1", "*.ps1")
     $Params = @{
         Path                   = "$ENV:BHProjectPath\Tests"
         OutputFile             = "$ENV:BHProjectPath\$TestFile"
         OutputFormat           = 'NUnitXml'
-        CodeCoverage           = $CodeFiles
+        CodeCoverage           = $CodeFiles.FullName
         CodeCoverageOutputFile = "$ENV:BHProjectPath\$CoverageFile"
         Show                   = 'Fails'
         PassThru               = $true
     }
     $TestResults = Invoke-Pester @Params
     [Net.ServicePointManager]::SecurityProtocol = $SecurityProtocol
+    $TestSourceDirs = ($CodeFiles.ParentDirectoryName | Sort-Object -Unique) -join ";"
+    Write-Host "##vso[task.setvariable variable=CodeCoverageDirectories]$TestSourceDirs"
 
     #Remove-Item "$ENV:BHProjectPath\$TestFile" -Force -ErrorAction SilentlyContinue
     # Failed tests?
