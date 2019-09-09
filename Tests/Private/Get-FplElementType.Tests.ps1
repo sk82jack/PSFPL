@@ -3,10 +3,12 @@ InModuleScope 'PSFPL' {
     Describe 'Get-FplElementType' {
         BeforeAll {
             Mock Invoke-RestMethod {
-                @(
-                    [pscustomobject]@{id = 1; singular_name = 'Goalkeeper'},
-                    [pscustomobject]@{id = 2; singular_name = 'Defender'}
-                )
+                [PSCustomObject]@{
+                    element_types = @(
+                        [pscustomobject]@{id = 1; singular_name = 'Goalkeeper'},
+                        [pscustomobject]@{id = 2; singular_name = 'Defender'}
+                    )
+                }
             }
             $Result = Get-FplElementType
         }

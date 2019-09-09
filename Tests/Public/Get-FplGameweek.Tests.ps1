@@ -2,7 +2,11 @@ Import-Module $ENV:BHPSModuleManifest -Force
 InModuleScope 'PSFPL' {
     Describe 'Get-FplPlayer' {
         BeforeAll {
-            Mock Invoke-RestMethod {$true}
+            Mock Invoke-RestMethod {
+                [PSCustomObject]@{
+                    events = $true
+                }
+            }
             Mock ConvertTo-FplObject {
                 @(
                     [pscustomobject]@{

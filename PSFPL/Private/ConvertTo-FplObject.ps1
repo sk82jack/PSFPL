@@ -9,7 +9,7 @@ function ConvertTo-FplObject {
     .PARAMETER Type
         The type name to give the resulted PowerShell object
     .EXAMPLE
-        $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/elements/' -UseBasicParsing
+        $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/elements/' -UseBasicParsing
         ConvertTo-FplObject -InputObject $Response -Type 'FplPlayer'
     .LINK
         https://github.com/sk82jack/PSFPL/
@@ -33,25 +33,29 @@ function ConvertTo-FplObject {
             $PositionHash = Get-FplElementType
             $TeamHash = Get-FplClubId
         }
+        'FplGameweek' {
+            $PlayerHash = Get-FplElementId
+        }
         'FplFixture' {
             $TeamHash = Get-FplClubId
             $PlayerHash = Get-FplElementId
         }
         'FplLeagueTable' {
             $LeagueName = $InputObject[0].league.name
+            $LeagueId = $InputObject[0].league.id
             $InputObject = $InputObject.foreach{$_.standings.results}
         }
         'FplTeam' {
             $TeamHash = Get-FplClubId
         }
         'FplLeague' {
-            $InputObject = @($InputObject.classic) + @($InputObject.h2h).where{$_.name -ne 'cup'}
+            $InputObject = @($InputObject.classic) + @($InputObject.h2h).where{$_.name -and $_.name -ne 'cup'}
         }
         'FplTeamPlayer' {
-            $Players = Get-FplPlayer
+            $Players = ConvertTo-FplObject -InputObject $Script:FplSessionData['Players'].Where{$_.id -in $InputObject.element} -Type FplPlayer
         }
         'FplLineup' {
-            $Players = Get-FplPlayer
+            $Players = ConvertTo-FplObject -InputObject $Script:FplSessionData['Players'].Where{$_.id -in $InputObject.element} -Type FplPlayer
         }
     }
 
@@ -90,6 +94,19 @@ function ConvertTo-FplObject {
                 $Hashtable['Gameweek'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
                 $Hashtable['DeadlineTime'] = Get-Date $Object.deadline_time
+                $Hashtable['BenchBoostPlays'] = $Hashtable['ChipPlays'].Where{$_.chip_name -eq 'bboost'}[0].num_played
+                $Hashtable['TripleCaptainPlays'] = $Hashtable['ChipPlays'].Where{$_.chip_name -eq '3xc'}[0].num_played
+                $Hashtable.Remove('ChipPlays')
+                foreach ($Property in 'MostSelected', 'MostTransferredIn', 'TopElement', 'MostCaptained', 'MostViceCaptained') {
+                    $Hashtable["$($Property)Id"] = $Hashtable[$Property]
+                    if ($HashTable[$Property]) {
+                        $Hashtable[$Property] = $PlayerHash[$HashTable[$Property]]
+                    }
+                }
+                $Hashtable['TopElementPoints'] = if ($Hashtable['TopElementInfo']) {
+                    $Hashtable['TopElementInfo'].points
+                }
+                $Hashtable.Remove('TopElementInfo')
             }
             'FplFixture' {
                 $Hashtable['FixtureId'] = $Hashtable['Id']
@@ -129,21 +146,20 @@ function ConvertTo-FplObject {
             }
             'FplLeagueTable' {
                 $Hashtable['LeagueName'] = $LeagueName
-                $Hashtable['LeagueId'] = $Hashtable['League']
-                $Hashtable.Remove('League')
+                $Hashtable['LeagueId'] = $LeagueId
                 $Hashtable['TeamId'] = $Hashtable['Team']
                 $Hashtable.Remove('Team')
             }
             'FplTeam' {
-                $Hashtable['Bank'] = $Hashtable['Bank'] / 10
-                $Hashtable['Value'] = $Hashtable['Value'] / 10
                 if ($Hashtable['FavouriteClub']) {
                     $Hashtable['FavouriteClub'] = $TeamHash[$Hashtable['FavouriteClub']]
                 }
                 $Hashtable['TeamId'] = $Hashtable['Id']
                 $Hashtable.Remove('Id')
-                $Hashtable['PlayerId'] = $Hashtable['Player']
-                $Hashtable.Remove('Player')
+                $Hashtable['JoinedTime'] = Get-Date $Object.joined_time
+                $Hashtable.Remove('Leagues')
+                $Hashtable['LastDeadlineBank'] = $Hashtable['LastDeadlineBank'] / 10
+                $Hashtable['LastDeadlineValue'] = $Hashtable['LastDeadlineValue'] / 10
             }
             'FplLeague' {
                 $Hashtable['LeagueId'] = $Hashtable['Id']
@@ -157,6 +173,7 @@ function ConvertTo-FplObject {
                     'c' {'Classic'}
                     'h' {'H2H'}
                 }
+                $Hashtable['Created'] = Get-Date $Hashtable['Created']
             }
             'FplTeamPlayer' {
                 $Hashtable['PlayerId'] = $Hashtable['Element']
@@ -174,7 +191,7 @@ function ConvertTo-FplObject {
                 }
                 $Hashtable['Points'] = $CurrentPlayer.GameweekPoints * $Hashtable['Multiplier']
                 $Hashtable.Remove('Multiplier')
-
+                $Hashtable['NewsAdded'] = Get-Date $Hashtable['NewsAdded']
             }
             'FplLineup' {
                 $Hashtable['PlayerId'] = $Hashtable['Element']
@@ -182,15 +199,18 @@ function ConvertTo-FplObject {
                 $Hashtable['PositionNumber'] = $Hashtable['Position']
                 if ($Hashtable.position -le 11) {
                     $Hashtable['PlayingStatus'] = 'Starting'
+                    $Hashtable['IsSub'] = $false
                 }
                 else {
                     $Hashtable['PlayingStatus'] = 'Substitute'
+                    $Hashtable['IsSub'] = $true
                 }
                 $CurrentPlayer = $Players.Where{$_.PlayerId -eq $Hashtable['PlayerId']}
                 foreach ($Property in 'Name', 'Position', 'Club') {
                     $Hashtable[$Property] = $CurrentPlayer.$Property
                 }
                 $Hashtable['SellingPrice'] = $Hashtable['SellingPrice'] / 10
+                $Hashtable['PurchasePrice'] = $Hashtable['PurchasePrice'] / 10
             }
         }
         $Hashtable['PsTypeName'] = $Type

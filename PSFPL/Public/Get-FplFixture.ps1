@@ -46,7 +46,7 @@ function Get-FplFixture {
     )
 
     process {
-        $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/fixtures/' -UseBasicParsing
+        $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/fixtures/' -UseBasicParsing
         if ($Response -match 'The game is being updated.') {
             Write-Warning 'The game is being updated. Please try again shortly.'
             return

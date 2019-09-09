@@ -40,7 +40,7 @@ InModuleScope 'PSFPL' {
                 }
                 Get-FplLeague
                 Assert-MockCalled Invoke-RestMethod -Exactly 1 -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/12345'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/12345/'
                 }
             }
         }
@@ -48,13 +48,13 @@ InModuleScope 'PSFPL' {
             It 'passes the TeamId onto Invoke-RestMethod correctly' {
                 Get-FplLeague -TeamId 654321
                 Assert-MockCalled Invoke-RestMethod -Exactly 1 -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/654321'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/654321/'
                 }
             }
             It 'accepts pipeline input' {
                 654321 | Get-FplLeague
                 Assert-MockCalled Invoke-RestMethod -Exactly 1 -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/654321'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/654321/'
                 }
             }
         }

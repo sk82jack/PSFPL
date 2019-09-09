@@ -43,12 +43,12 @@ function Get-FplGameweek {
         $Current
     )
 
-    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/events/' -UseBasicParsing
+    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/bootstrap-static/' -UseBasicParsing
     if ($Response -match 'The game is being updated.') {
         Write-Warning 'The game is being updated. Please try again shortly.'
         return
     }
-    $Gameweeks = ConvertTo-FplObject -InputObject $Response -Type 'FplGameweek'
+    $Gameweeks = ConvertTo-FplObject -InputObject $Response.events -Type 'FplGameweek'
 
     if ($Current) {
         $Gameweeks.Where{$_.IsCurrent}

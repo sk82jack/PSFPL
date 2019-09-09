@@ -39,7 +39,7 @@ InModuleScope 'PSFPL' {
             It 'gets the lineup of the logged in players team' {
                 Get-FplLineup
                 Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/my-team/67890/'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/my-team/67890/'
                 }
             }
         }
@@ -50,7 +50,7 @@ InModuleScope 'PSFPL' {
             It 'authenticates to get your team ID' {
                 Get-FplLineup
                 Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/my-team/12345/'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/my-team/12345/'
                 }
             }
         }

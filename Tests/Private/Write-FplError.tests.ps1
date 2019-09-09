@@ -36,10 +36,6 @@ InModuleScope 'PSFPL' {
                 }
             }
         }
-        It 'parses and replaces the negative bank balance error' {
-            $ExpectedMessage = 'Negative bank balance -{0}1.5m is not allowed.' -f [char]163
-            {Write-FplError -FplError $NegativeBankError} | Should -Throw -ExpectedMessage $ExpectedMessage
-        }
         It 'parses a generic non form error' {
             $ExpectedMessage = 'No transfers are being made'
             {Write-FplError -FplError $NoTransfersError} | Should -Throw -ExpectedMessage $ExpectedMessage

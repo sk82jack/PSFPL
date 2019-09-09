@@ -3,10 +3,12 @@ InModuleScope 'PSFPL' {
     Describe 'Get-FplClubId' {
         BeforeAll {
             Mock Invoke-RestMethod {
-                @(
-                    [pscustomobject]@{id = 1; name = 'Arsenal'},
-                    [pscustomobject]@{id = 2; name = 'Bournemouth'}
-                )
+                [PSCustomObject]@{
+                    teams = @(
+                        [pscustomobject]@{id = 1; name = 'Arsenal'},
+                        [pscustomobject]@{id = 2; name = 'Bournemouth'}
+                    )
+                }
             }
             $Result = Get-FplClubId
         }

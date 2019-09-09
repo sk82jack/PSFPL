@@ -11,9 +11,18 @@ function Get-FplClubId {
     #>
     [CmdletBinding()]
     param ()
-    $Response = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/drf/teams/' -UseBasicParsing
     $Hashtable = @{}
-    foreach ($Club in $Response) {
+
+    if ((-not $Script:FplSessionData) -or (-not $Script:FplSessionData['Clubs'])) {
+        $Bootstrap = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/bootstrap-static/' -UseBasicParsing
+        $Script:FplSessionData = @{
+            ElementTypes = $Bootstrap.element_types
+            Clubs        = $Bootstrap.teams
+            Players      = $Bootstrap.elements
+        }
+    }
+
+    foreach ($Club in $Script:FplSessionData['Clubs']) {
         $Hashtable[$Club.id] = $Club.name
     }
     $Hashtable

@@ -226,7 +226,6 @@ InModuleScope 'PSFPL' {
             $Script:FplSessionData = @{
                 FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
                 TeamID     = 12345
-                CsrfToken  = 'csrftoken'
             }
             Set-FplLineup -PlayersIn $Sterling -PlayersOut $Digne
             Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
@@ -237,8 +236,7 @@ InModuleScope 'PSFPL' {
                     $_.is_captain -eq $false -and
                     $_.is_vice_captain -eq $false
                 } -notcontains $false -and
-                $Uri -eq 'https://fantasy.premierleague.com/drf/my-team/12345/' -and
-                $Headers['X-CSRFToken'] -eq 'csrftoken'
+                $Uri -eq 'https://fantasy.premierleague.com/api/my-team/12345/'
             }
         }
         It 'catches, formats and re-throws errors from the API' {

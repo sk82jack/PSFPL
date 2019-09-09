@@ -1,5 +1,8 @@
 [cmdletbinding()]
 param()
+if ($MyInvocation.Line -match '-verbose') {
+    $VerbosePreference = 'Continue'
+}
 Write-Verbose "This psm1 is replaced in the build output. This file is only used for debugging."
 Write-Verbose $PSScriptRoot
 Write-Verbose 'Import everything in sub folders'

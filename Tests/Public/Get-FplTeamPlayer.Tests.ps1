@@ -8,14 +8,22 @@ InModuleScope 'PSFPL' {
                 }
             }
             Mock ConvertTo-FplObject {}
+            Mock Get-FplGameweek {
+                [PSCustomObject]@{
+                    Gameweek = 13
+                }
+            }
+            Mock Write-Warning {}
         }
         Context 'TeamId and Gameweek supplied' {
             It 'passes the TeamId onto Invoke-RestMethod' {
-                $Results = Get-FplTeamPlayer -TeamId 123456 -Gameweek 13
-                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456/event/13/picks'} -Scope 'It'
+                Get-FplTeamPlayer -TeamId 123456 -Gameweek 13
+                Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/123456/event/13/picks/'
+                }
             }
         }
-        Context 'No TeamID whilst not logged in' {
+        Context 'No TeamId whilst not logged in' {
             BeforeAll {
                 Mock Get-Credential {
                     $Password = ConvertTo-SecureString 'password' -AsPlainText -Force
@@ -24,8 +32,8 @@ InModuleScope 'PSFPL' {
                 Mock Connect-Fpl {
                     $Script:FplSessionData = @{
                         FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
-                        CsrfToken  = 'csrftoken'
                         TeamID     = 12345
+                        CurrentGW  = 13
                     }
                 }
             }
@@ -33,11 +41,13 @@ InModuleScope 'PSFPL' {
                 Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
             It 'returns a warning' {
-                $Result = Get-FplTeamPlayer -Gameweek 14 3>&1
-                $Result.Message | Should -Contain 'No existing connection found'
+                Get-FplTeamPlayer -Gameweek 12
+                Assert-MockCalled Write-Warning -Scope 'It' -ParameterFilter {
+                    $Message -eq 'No existing connection found'
+                }
             }
             It "connects to the FPL API" {
-                $Result = Get-FplTeamPlayer -Gameweek 14 -WarningAction SilentlyContinue
+                Get-FplTeamPlayer -Gameweek 12
                 Assert-MockCalled Connect-Fpl -Scope 'It'
             }
         }
@@ -45,51 +55,76 @@ InModuleScope 'PSFPL' {
             BeforeAll {
                 $Script:FplSessionData = @{
                     FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
-                    CsrfToken  = 'csrftoken'
                     TeamID     = 12345
+                    CurrentGW  = 13
                 }
             }
             AfterAll {
                 Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
-            It 'calls Get-FplUserTeam when no parameter is given' {
-                $Results = Get-FplTeamPlayer -Gameweek 13
+            It 'gets logged in user team and current gameweek from cache' {
+                Get-FplTeamPlayer -Gameweek 12
                 Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/12345/event/13/picks'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/12345/event/12/picks/'
                 }
             }
         }
         Context 'No Gameweek parameter supplied' {
-            BeforeAll {
-                Mock Get-FplGameweek {
-                    [PSCustomObject]@{
-                        Gameweek = 13
-                    }
-                }
-            }
             AfterEach {
                 Remove-Variable -Name 'FplSessionData' -Scope 'Script' -ErrorAction 'SilentlyContinue'
             }
             It 'calls Get-FplGameweek when no parameter is given and the user has not authenticated' {
-                $Result = Get-FplTeamPlayer -TeamId 123456
+                Get-FplTeamPlayer -TeamId 123456
                 Assert-MockCalled Get-FplGameweek -Scope 'It'
             }
             It 'gets the current gameweek from the FplSessionData variable when authenticated' {
                 $Script:FplSessionData = @{
                     CurrentGW = 27
                 }
-                $Result = Get-FplTeamPlayer -TeamId 123456
+                Get-FplTeamPlayer -TeamId 123456
                 Assert-MockCalled Invoke-RestMethod -Scope 'It' -ParameterFilter {
-                    $Uri -eq 'https://fantasy.premierleague.com/drf/entry/123456/event/27/picks'
+                    $Uri -eq 'https://fantasy.premierleague.com/api/entry/123456/event/27/picks/'
                 }
             }
         }
-        Context 'When the game is updating' {
-            BeforeAll {
-                Mock Invoke-RestMethod {'The game is being updated.'}
+        Context 'Error handling' {
+            It 'throws an error if you specify a future gameweek' {
+                {Get-FplTeamPlayer -TeamId 123456 -Gameweek 38} | Should -Throw -ExpectedMessage 'Cannot view team because the gameweek has not started yet'
             }
             It 'shows a warning when the game is updating' {
-                Get-FplTeamPlayer -TeamId 123456 -Gameweek 12 3>&1 | Should -Be 'The game is being updated. Please try again shortly.'
+                Mock Invoke-RestMethod {'The game is being updated.'}
+                Get-FplTeamPlayer -TeamId 123456 -Gameweek 12
+                Assert-MockCalled Write-Warning -Scope 'It' -ParameterFilter {
+                    $Message -eq 'The game is being updated. Please try again shortly.'
+                }
+            }
+            It 'throws an error if the manager did not have a team in the specified gameweek' {
+                Mock Invoke-RestMethod {
+                    $Exception = [Exception]::new('Not found')
+                    $ErrorRecord = [System.Management.Automation.ErrorRecord]::new(
+                        $Exception,
+                        "NotFound",
+                        'NotSpecified',
+                        $null
+                    )
+                    $ErrorRecord.ErrorDetails = '{"detail":"Not found."}'
+                    Write-Error -ErrorRecord $ErrorRecord -ErrorAction 'Stop'
+                }
+                {Get-FplTeamPlayer -TeamId 123456 -Gameweek 1} | Should -Throw -ExpectedMessage 'Team did not exist in gameweek 1'
+            }
+            It 're-throws unknown errors from the API' {
+                Mock Invoke-RestMethod {
+                    $Exception = [Exception]::new('Unknown Error')
+                    $ErrorRecord = [System.Management.Automation.ErrorRecord]::new(
+                        $Exception,
+                        "UnknownError",
+                        'NotSpecified',
+                        $null
+                    )
+                    $ErrorRecord.ErrorDetails = 'Unknown error'
+                    Write-Error -ErrorRecord $ErrorRecord -ErrorAction 'Stop'
+                }
+                {Get-FplTeamPlayer -TeamId 123456 -Gameweek 1} | Should -Throw -ExpectedMessage 'Unknown Error'
             }
         }
     }

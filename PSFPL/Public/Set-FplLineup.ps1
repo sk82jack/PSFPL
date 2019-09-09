@@ -143,14 +143,13 @@ function Set-FplLineup {
     }
     $TeamId = $Script:FplSessionData['TeamID']
     $Params = @{
-        Uri             = "https://fantasy.premierleague.com/drf/my-team/$TeamId/"
+        Uri             = "https://fantasy.premierleague.com/api/my-team/$TeamId/"
         UseBasicParsing = $true
         WebSession      = $FplSessionData['FplSession']
         Method          = 'Post'
         Body            = ($Body | ConvertTo-Json)
         Headers         = @{
             'Content-Type'     = 'application/json; charset=UTF-8'
-            'X-CSRFToken'      = $FplSessionData['CsrfToken']
             'X-Requested-With' = 'XMLHttpRequest'
             'Referer'          = 'https://fantasy.premierleague.com/a/team/my'
         }
