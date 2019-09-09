@@ -31,7 +31,7 @@ jobs:
       condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       inputs:
         reports: 'TestCoverage.xml'
-        reporttypes: 'HtmlInline_AzurePipelines'
+        reporttypes: 'HtmlInline_AzurePipelines_Dark'
         sourcedirs: $(CodeCoverageDirectories)
         targetdir: coveragereport
 
