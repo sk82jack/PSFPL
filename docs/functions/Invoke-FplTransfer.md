@@ -6,7 +6,7 @@ Makes a transfer for the upcoming gameweek
 ## SYNTAX
 
 ```
-Invoke-FplTransfer [-PlayersIn] <Object> [-PlayersOut] <Object> [[-ActivateChip] <String>] [-Force]
+Invoke-FplTransfer [-PlayersIn] <Object> [-PlayersOut] <Object> [[-ActivateChip] <Object>] [-Force]
  [<CommonParameters>]
 ```
 
@@ -130,7 +130,7 @@ Accept wildcard characters: False
 Use this parameter to activate your Wildcard or Free Hit
 
 ```yaml
-Type: String
+Type: Object
 Parameter Sets: (All)
 Aliases:
 

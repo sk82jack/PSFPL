@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2019-09-09
+### Fixed
+- Refactored module to use the new API endpoint
+
 ## [2.0.1] - 2019-04-08
 ### Fixed
 - Fixed a bug in Set-FplLineup which meant you could not sub on a player and captain him with the same command.
@@ -48,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Get-FplPlayer - a function to retrieve player data
 - Connect-FPL - a function to log into the FPL API to retrieve data about your team
 
+[3.0.0]: https://github.com/sk82jack/PSFPL/compare/v2.0.1..v3.0.0
 [2.0.1]: https://github.com/sk82jack/PSFPL/compare/v2.0..v2.0.1
 [2.0]: https://github.com/sk82jack/PSFPL/compare/v1.0.3..v2.0
 [1.0.3]: https://github.com/sk82jack/PSFPL/compare/v1.0.2..v1.0.3
