@@ -100,6 +100,7 @@ Task Test -Depends Init {
     $TestResults = Invoke-Pester @Params
     [Net.ServicePointManager]::SecurityProtocol = $SecurityProtocol
     $TestSourceDirs = ($CodeFiles.ParentDirectoryName | Sort-Object -Unique) -join ";"
+    Write-Host "INFO [task.setvariable variable=CodeCoverageDirectories]$TestSourceDirs"
     Write-Host "##vso[task.setvariable variable=CodeCoverageDirectories]$TestSourceDirs"
 
     #Remove-Item "$ENV:BHProjectPath\$TestFile" -Force -ErrorAction SilentlyContinue
