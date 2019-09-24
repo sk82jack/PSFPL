@@ -26,22 +26,12 @@ jobs:
         testResultsFiles: '**/TestResults.xml'
         testRunTitle: 'PS_Win2016'
 
-#    - task: reportgenerator@4
-#      displayName: 'Generate Code Coverage Report'
-#      condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-#      inputs:
-#        reports: 'TestCoverage.xml'
-#        reporttypes: 'HtmlInline_AzurePipelines_Dark'
-#        sourcedirs: $(CodeCoverageDirectories)
-#        targetdir: coveragereport
-
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish Code Coverage Results'
       condition: and(always(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       inputs:
         codeCoverageTool: 'JaCoCo'
         summaryFileLocation: '**/TestCoverage.xml'
-        #reportDirectory: coveragereport
         pathToSources: '$(CodeCoverageDirectories)'
 
     - task: Powershell@2
