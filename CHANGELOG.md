@@ -54,11 +54,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Get-FplPlayer - a function to retrieve player data
 - Connect-FPL - a function to log into the FPL API to retrieve data about your team
 
-[Unreleased]: https://github.com/sk82jack/PSFPL/compare/v3.0.0..HEAD
-[3.0.0]: https://github.com/sk82jack/PSFPL/compare/v2.0.1..v3.0.0
-[2.0.1]: https://github.com/sk82jack/PSFPL/compare/v2.0..v2.0.1
-[2.0]: https://github.com/sk82jack/PSFPL/compare/v1.0.3..v2.0
-[1.0.3]: https://github.com/sk82jack/PSFPL/compare/v1.0.2..v1.0.3
-[1.0.2]: https://github.com/sk82jack/PSFPL/compare/v1.0.1..v1.0.2
-[1.0.1]: https://github.com/sk82jack/PSFPL/compare/v1.0.0..v1.0.1
-[1.0.0]: https://github.com/sk82jack/PSFPL/tree/v1.0.0
+[Unreleased]: https://github.com/sk82jack/PSFPL/compare/3.0.0..HEAD
+[3.0.0]: https://github.com/sk82jack/PSFPL/compare/2.0.1..3.0.0
+[2.0.1]: https://github.com/sk82jack/PSFPL/compare/2.0..2.0.1
+[2.0]: https://github.com/sk82jack/PSFPL/compare/1.0.3..2.0
+[1.0.3]: https://github.com/sk82jack/PSFPL/compare/1.0.2..1.0.3
+[1.0.2]: https://github.com/sk82jack/PSFPL/compare/1.0.1..1.0.2
+[1.0.1]: https://github.com/sk82jack/PSFPL/compare/1.0.0..1.0.1
+[1.0.0]: https://github.com/sk82jack/PSFPL/tree/1.0.0
