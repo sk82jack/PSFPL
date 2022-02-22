@@ -62,7 +62,7 @@ Task SetBuildVersion -Depends Init {
     if (!$ENV:GITHUB_PAT) {
         Write-Error "GitHub personal access token not found"
     }
-    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
+    $GitHubUrl = 'https://sk82jack:{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 
     "`tSetting build version"
     $BuildVersionPath = "$ENV:BHProjectPath\BUILDVERSION.md"
@@ -257,7 +257,7 @@ Task Deploy -Depends TestAfterBuild {
     if (!$ENV:GITHUB_PAT) {
         Write-Error "GitHub personal access token not found"
     }
-    $GitHubUrl = 'https://{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
+    $GitHubUrl = 'https://sk82jack:{0}@github.com/sk82jack/PSFPL.git' -f $ENV:GITHUB_PAT
 
     "`tDeploying built docs to GitHub"
     git add "$env:BHProjectPath\docs\*"
