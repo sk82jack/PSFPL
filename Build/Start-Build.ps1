@@ -8,7 +8,7 @@ Try {
     $null = Resolve-Path -Path $NuGetPath -ErrorAction Stop
 }
 Catch {
-    New-Item -Path (Split-Path -Path $NuGetPath -Parent) -ItemType Directory
+    New-Item -Path $NuGetDirectory -ItemType Directory -ErrorAction 'SilentlyContinue'
     Invoke-RestMethod https://nuget.org/nuget.exe -OutFile $NuGetPath
 }
 
