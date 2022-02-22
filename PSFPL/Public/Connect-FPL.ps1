@@ -35,12 +35,14 @@ function Connect-Fpl {
     }
 
     $Uri = 'https://users.premierleague.com/accounts/login/'
-    $null = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -Method 'Post' -UseBasicParsing -Body @{
+    $null = Invoke-WebRequest -Uri $Uri -SessionVariable 'FplSession' -Method 'Post' -UseBasicParsing -UserAgent 'Dalvik/2.1.0 (Linux; U; Android 5.1; PRO 5 Build/LMY47D)' -Body @{
         'login'        = $Credential.UserName
         'password'     = $Credential.GetNetworkCredential().Password
         'app'          = 'plfpl-web'
         'redirect_uri' = 'https://fantasy.premierleague.com/a/login'
     }
+
+    $FplSession.UserAgent = [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox
 
     $ManagerInfo = Invoke-RestMethod -Uri 'https://fantasy.premierleague.com/api/me/' -UseBasicParsing -WebSession $FplSession
 
