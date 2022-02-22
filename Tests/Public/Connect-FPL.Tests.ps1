@@ -13,6 +13,7 @@ InModuleScope 'PSFPL' {
                 $Credential = [pscredential]::new($Body['login'], $Password)
                 $Script:FplSession = [Microsoft.PowerShell.Commands.WebRequestSession]@{
                     Credentials = $Credential
+                    UserAgent   = $UserAgent
                 }
             }
 
@@ -49,6 +50,12 @@ InModuleScope 'PSFPL' {
                 Connect-FPL -Credential $GoodCreds -Force
                 $ExpectedMessage = 'A connection already exists. Use the Force parameter to connect.'
                 Assert-MockCalled Write-Warning -ParameterFilter {$Message -eq $ExpectedMessage} -Scope 'It' -Exactly 0
+            }
+            It 'uses the workaround User Agent once and only once' {
+                Connect-FPL -Credential $GoodCreds
+                $WorkAroundUA = 'Dalvik/2.1.0 (Linux; U; Android 5.1; PRO 5 Build/LMY47D)'
+                Assert-MockCalled Invoke-WebRequest -ParameterFilter {$UserAgent -eq $WorkAroundUA} -Scope 'It' -Exactly 1
+                Assert-MockCalled Invoke-RestMethod -ParameterFilter {$WebSession.UserAgent -eq $WorkAroundUA} -Scope 'It' -Exactly 0
             }
         }
         Context 'Output' {
